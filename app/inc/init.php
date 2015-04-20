@@ -31,4 +31,4 @@ if (php_sapi_name() != 'cli') {
     //    require_once INC . 'dispatcher.php';
 }
 
-include WEB_ROOT . 'index.php';
+include WEB_ROOT . 'insert_rules.php';
