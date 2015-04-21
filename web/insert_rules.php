@@ -1,5 +1,6 @@
 <?php
 
+//use Bit3\GitPhp\GitConfig;
 use Bit3\GitPhp\GitException;
 use Bit3\GitPhp\GitRepository;
 use Monolog\Handler\StreamHandler;
@@ -9,49 +10,72 @@ function insertRules($rules, $file_name)
 {
     $logger = new Logger('Insert');
     $logger->pushHandler(new StreamHandler(INSTALL_ROOT
-        . 'logs/insert-errors.log'));
+                                          . 'logs/insert-errors.log'));
+    $repo = 'typolib';
+    $repo_url = 'https://github.com/' . urlencode(TYPOLIB_GITHUB_ACCOUNT)
+              . '/' . $repo . '.git';
+    $directory = DATA_ROOT . $repo . '/';
+    $file_name = $directory . 'data/' . $file_name . '.php';
+    $config_file = $directory . '.git/config';
+    $user_config = "[user]\n"
+                 . "	email = al2c-typolib@googlegroups.com\n"
+                 . "	name = Typolib\n";
+    $typolib_remote = 'origin';
+    $client_remote = 'github';
+    $client_remote_url = 'https://' . urlencode(CLIENT_GITHUB_ACCOUNT) . ':'
+                       . urlencode(CLIENT_GITHUB_PASSWORD) . '@github.com/'
+                       . urlencode(CLIENT_GITHUB_ACCOUNT) . '/' . $repo
+                       . '.git';
+    $branch = 'mabranche3';
+
     try {
-        $directory = INSTALL_ROOT . 'data/typolib/';
         $git = new GitRepository($directory);
+
+        // Clone a fresh repo if it's folder is empty
         if (! is_dir($directory)) {
-            $git->cloneRepository()->execute('https://github.com/'
-                . TYPOLIB_GITHUB_ACCOUNT . '/typolib.git');
+            $git->cloneRepository()->execute($repo_url);
+            $git->remote()->add($client_remote, $client_remote_url)->execute();
+            $git->fetch()->execute($client_remote);
+            file_put_contents($config_file, $user_config, FILE_APPEND);
         }
 
-        if (! in_array('github', $git->remote()->getNames())) {
-            $git->remote()
-            ->add('github', 'https://' . CLIENT_GITHUB_ACCOUNT . ':'
-                . CLIENT_GITHUB_PASSWORD . '@github.com/typolib/typolib.git')
-            ->execute();
-            $git->fetch()->execute('github');
-        }
-        $git->fetch()->execute('origin', 'master');
-        $git->checkout()->execute('origin/master');
-
-        if (in_array('github/mabranche2', $git->branch()->remotes()->getNames())) {
-            $git->push()->execute('github', ':mabranche2');
-            $git->fetch()->execute('github');
+        // Add client remote if it's missing
+        if (! in_array($client_remote, $git->remote()->getNames())) {
+            $git->remote()->add($client_remote, $client_remote_url)->execute();
+            $git->fetch()->execute($client_remote);
         }
 
-        if (in_array('mabranche2', $git->branch()->getNames())) {
-            $git->branch()->delete()->execute('mabranche2');
+        // Fetch latest changes to master branch, then switch to master
+        $git->fetch()->execute($typolib_remote, 'master');
+        $git->checkout()->execute($typolib_remote . '/master');
+
+        // Remove branches both remotely and locally
+        if (in_array($client_remote . '/' . $branch, $git->branch()->remotes()->getNames())) {
+            $git->push()->execute($client_remote, ':' . $branch);
+        }
+        if (in_array($branch, $git->branch()->getNames())) {
+            $git->branch()->delete()->execute($branch);
         }
 
-        $git->branch()->execute('mabranche2');
-        $git->checkout()->execute('mabranche2');
+        // Create a fresh branch
+        $git->branch()->execute($branch);
+        $git->checkout()->execute($branch);
 
-        $file_name = DATA_ROOT . '/typolib/data/' . $file_name . '.php';
+        // Update content in repository
         if (! file_put_contents($file_name, $rules)) {
-            $logger->error("Can't write into data folder");
+            $logger->error('Can\'t write into data folder');
         }
 
+        // Add files to git index, commit and push to client remote
         $git->add()->execute($file_name);
         $git->commit()->message('Commit message')->execute();
-        $git->push()->execute('github', 'mabranche2');
+        $git->push()->execute($client_remote, $branch);
     } catch (GitException $e) {
-        $logger->error("Failed committing changes to " . $file_name . ". Error: "
-            . $e->getMessage());
+        $logger->error("Failed committing changes to $file_name. Error: "
+                       . $e->getMessage());
     }
+
+    return 0;
 }
 
-insertRules("Règle 1\nRègle 2\n", "test");
+insertRules("Règle 1\nRègle 2\n", 'test');

@@ -10,7 +10,7 @@ config=${TYPOLIBDIR}/app/config
 ; Typolib’ Github account
 typolib_github_account=TheoChevalier
 
-; Client Github account
+; Client Github username
 client_github_account=typolib
 
 ; Client Github password
