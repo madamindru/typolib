@@ -7,9 +7,13 @@ before_script:
   - composer install
   ## travis configuration
   - cp app/config/config.ini-travis app/config/config.ini
+  ## Atoum
+  - mkdir -p build/logs
 script:
-  - vendor/atoum/atoum/bin/atoum -d tests/units/
+  - php vendor/atoum/atoum/bin/atoum -d tests/units/ -c .atoum.php
   - vendor/bin/php-cs-fixer --diff --dry-run -v fix
+after_script:
+  - php vendor/bin/coveralls
 notifications:
   email:
     on_success: always
