@@ -33,6 +33,7 @@ class PullRequest
     public $commit_msg;
     public $git;
     public $logger;
+    public $mada;
 
     /**
      * Constructor initializes all the arguments then call the method to clone
