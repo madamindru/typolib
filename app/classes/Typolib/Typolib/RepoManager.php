@@ -195,9 +195,11 @@ class RepoManager
     }
 
     /**
-     * Check if our local clone is up-to-date
+     * Check if our local clone is up-to-date. If it's not, it is automatically
+     * updated.
      *
-     * @return boolean Returns true if our clone is up-to-date, false otherwise.
+     * @return boolean Returns true if our clone is up-to-date or has been
+     *                 successfully updated, false otherwise.
      */
     public function checkForUpdates()
     {
