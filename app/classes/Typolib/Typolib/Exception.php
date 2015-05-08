@@ -48,7 +48,7 @@ class Exception
      */
     private function createException($code_name, $code_locale)
     {
-        $folder = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
+        $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
         $exception = Exception::getArrayExceptions($code_name, $code_locale);
         $exception['exceptions'][] = ['rule_id' => $this->rule_id,
                                       'content' => $this->content, ];
@@ -57,7 +57,7 @@ class Exception
         end($exception['exceptions']);
         $this->id = key($exception['exceptions']);
 
-        file_put_contents($folder, serialize($exception));
+        Utils::fileForceContents($file, serialize($exception));
     }
 
     /**
@@ -73,7 +73,7 @@ class Exception
      */
     public static function manageException($code_name, $code_locale, $id, $action, $value = '')
     {
-        $folder = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
+        $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
 
         $exception = Exception::getArrayExceptions($code_name, $code_locale);
         if ($exception != null && Exception::existException($exception, $id)) {
@@ -87,7 +87,7 @@ class Exception
                     break;
 
             }
-            file_put_contents($folder, serialize($exception));
+            Utils::fileForceContents($file, serialize($exception));
 
             return true;
         }
@@ -116,9 +116,9 @@ class Exception
     private static function getArrayExceptions($code_name, $code_locale)
     {
         if (Code::existCode($code_name, $code_locale)) {
-            $folder = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
+            $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
 
-            return unserialize(file_get_contents($folder));
+            return unserialize(file_get_contents($file));
         }
     }
 }

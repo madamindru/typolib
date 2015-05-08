@@ -15,10 +15,11 @@ $ex = new Exception('firefox', 'fr', 0, 'contenu de l\'exception');
 
 //$ru = new Rule('typolib', 'fr', 'regle machin', 'ifthen');
 
-$pr = new RepoManager();
-//$pr->createNewBranch();
 
-$pr->updateMaster();
+//$pr->createNewBranch();
+$pr = new RepoManager();
+dump($pr->updateMaster());
+
 /*
 $file_name = DATA_ROOT . 'typolib-rules/test.php';
 // Update content in repository
