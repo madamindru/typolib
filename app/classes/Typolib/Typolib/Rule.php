@@ -56,7 +56,7 @@ class Rule
         end($code['rules']);
         $this->id = key($code['rules']);
 
-        Utils::fileForceContents($file, serialize($code));
+        file_put_contents($file, serialize($code));
     }
 
     /**
@@ -90,7 +90,7 @@ class Rule
                     $code['rules'][$id]['type'] = $value;
                     break;
             }
-            Utils::fileForceContents($file, serialize($code));
+            file_put_contents($file, serialize($code));
 
             return true;
         }

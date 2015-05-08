@@ -57,7 +57,7 @@ class Exception
         end($exception['exceptions']);
         $this->id = key($exception['exceptions']);
 
-        Utils::fileForceContents($file, serialize($exception));
+        file_put_contents($file, serialize($exception));
     }
 
     /**
@@ -87,7 +87,7 @@ class Exception
                     break;
 
             }
-            Utils::fileForceContents($file, serialize($exception));
+            file_put_contents($file, serialize($exception));
 
             return true;
         }

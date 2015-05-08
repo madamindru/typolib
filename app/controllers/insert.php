@@ -11,14 +11,8 @@ $ru = new Rule('firefox', 'fr', 'regle test', 'ifthen');
 $ru1 = new Rule('firefox', 'fr', 'regle numéro 2', 'ifthen');
 Rule::manageRule('firefox', 'fr', 0, 'update_content', 'test switch');
 $ex = new Exception('firefox', 'fr', 0, 'contenu de l\'exception');
-//$code = new Code('typolib', 'fr');
 
-//$ru = new Rule('typolib', 'fr', 'regle machin', 'ifthen');
-
-
-//$pr->createNewBranch();
 $pr = new RepoManager();
-dump($pr->updateMaster());
 
 /*
 $file_name = DATA_ROOT . 'typolib-rules/test.php';
@@ -26,8 +20,8 @@ $file_name = DATA_ROOT . 'typolib-rules/test.php';
 file_put_contents($file_name, "Règle 1\nRègle 2\n");
 
 $pr->commitAndPush();
+*/
 
-/*
 if (isset($_GET['rule'])) {
     include MODELS . 'inserted.php';
     include VIEWS . 'inserted.php';
@@ -35,4 +29,3 @@ if (isset($_GET['rule'])) {
     include MODELS . 'insert.php';
     include VIEWS . 'insert.php';
 }
-*/
