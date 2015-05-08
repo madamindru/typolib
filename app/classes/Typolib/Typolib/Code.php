@@ -47,9 +47,9 @@ class Code
     {
         if (! file_exists($this->path)) {
             $code = ['name' => $this->name];
-            mkdir($this->path, 0777, true);
-            file_put_contents($this->path . '/rules.php', serialize($code));
-            file_put_contents($this->path . '/exceptions.php', '');
+
+            Utils::fileForceContents($this->path . '/rules.php', serialize($code));
+            Utils::fileForceContents($this->path . '/exceptions.php', '');
 
             return true;
         }

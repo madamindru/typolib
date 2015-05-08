@@ -48,7 +48,7 @@ class Rule
      */
     public function createRule($name_code, $locale_code)
     {
-        $folder = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
+        $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
         $code = Rule::getArrayRules($name_code, $locale_code);
         $code['rules'][] = ['content' => $this->content, 'type' => $this->type];
 
@@ -56,7 +56,7 @@ class Rule
         end($code['rules']);
         $this->id = key($code['rules']);
 
-        file_put_contents($folder, serialize($code));
+        Utils::fileForceContents($file, serialize($code));
     }
 
     /**
@@ -73,7 +73,7 @@ class Rule
      */
     public static function manageRule($name_code, $locale_code, $id, $action, $value = '')
     {
-        $folder = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
+        $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
 
         $code = Rule::getArrayRules($name_code, $locale_code);
         if ($code != null && Rule::existRule($code, $id)) {
@@ -90,7 +90,7 @@ class Rule
                     $code['rules'][$id]['type'] = $value;
                     break;
             }
-            file_put_contents($folder, serialize($code));
+            Utils::fileForceContents($file, serialize($code));
 
             return true;
         }
@@ -119,9 +119,9 @@ class Rule
     public static function getArrayRules($name_code, $locale_code)
     {
         if (Code::existCode($name_code, $locale_code)) {
-            $folder = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
+            $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
 
-            return unserialize(file_get_contents($folder));
+            return unserialize(file_get_contents($file));
         }
     }
 
@@ -132,7 +132,7 @@ class Rule
      */
     public function addRuleToIfThenArrayRule($userString)
     {
-        $pieces = explode(" ", $userString);
+        $pieces = explode(' ', $userString);
         $inputCharacter = $pieces[1];
         $newCharacter = $pieces[3];
 
@@ -155,11 +155,7 @@ class Rule
     public static function generateRuleId()
     {
         $array = Rule::scanDirectory(DATA_ROOT . 'code');
-        if (empty($array)) {
-            $id = 0;
-        } else {
-            $id = max($array);
-        }
+        $id = empty($array) ? 0 : max($array);
 
         return ++$id;
     }

@@ -13,8 +13,9 @@ use Transvision\Strings;
  * RepoManager class
  *
  * This class provides methods to manage a Git repository: fork, clone, setup,
- * create a new branch, commit changes, push them to a remote branch on the fork, then create a
- * Pull-Request to the original repo. But it can also check for updates.
+ * create a new branch, commit changes, push them to a remote branch on the fork,
+ * then create a Pull-Request to the original repo. But it can also check for
+ * updates.
  *
  * @package Typolib
  */
@@ -37,11 +38,13 @@ class RepoManager
     private $logger;
 
     /**
-     * Constructor that initialize all the arguments then call the method to clone
+     * Constructor initializing all the arguments then calling the method to clone
      * and setup the Git repo.
      *
-     * @param array $args Array containing one or more class attributes, like for instance:
-     *                    ['repo' => 'typolib', 'path' => '~/typolib/data/typolib/']
+     * @param array $args Array containing one or more class attributes to
+     *                    override default attributes, like for instance:
+     *                    ['repo' => 'typolib',
+     *                    'path' => '/home/John/typolib/data/typolib/']
      */
     public function __construct(array $args = null)
     {
