@@ -48,8 +48,15 @@ class Code
         if (! file_exists($this->path)) {
             $code = ['name' => $this->name];
 
-            Utils::fileForceContents($this->path . '/rules.php', serialize($code));
-            Utils::fileForceContents($this->path . '/exceptions.php', '');
+            // Maybe it's just a new file, but maybe the repo has not been cloned.
+            // We need to make sure the repo is cloned before creating this directory.
+            if (! is_dir(DATA_ROOT . RULES_REPO)) {
+                new RepoManager();
+            }
+            mkdir($this->path, 0777, true);
+
+            file_put_contents($this->path . '/rules.php', serialize($code));
+            file_put_contents($this->path . '/exceptions.php', '');
 
             return true;
         }
