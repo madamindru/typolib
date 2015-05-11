@@ -14,6 +14,7 @@ class Code
     private $name;
     private $locale;
     private $path;
+    private static $code_list = [];
 
     /**
      * Constructor that initializes all the arguments then call the method
@@ -91,5 +92,46 @@ class Code
         $folder = DATA_ROOT . RULES_REPO . "/$locale/$name";
 
         return file_exists($folder);
+    }
+
+    /**
+     * List all the available codes for a given locale.
+     *
+     * @param  String $locale The locale of the codes we search.
+     * @return array  The list of all the codes for the locale.
+     */
+    public static function getCodeList($locale)
+    {
+        $dir = DATA_ROOT . RULES_REPO . "/$locale";
+
+        return self::scanDirectory($dir);
+    }
+
+    /**
+     * Scan a directory to find the name of all the codes in it.
+     *
+     * @param  String $dir The path directory we want to scan.
+     * @return array  $code_list The list of all the corresponding codes
+     *                    (key: the name of the folder,
+     *                    value: the real name of the code).
+     */
+    private static function scanDirectory($dir)
+    {
+        if (is_dir($dir)) {
+            $me = opendir($dir);
+            while ($child = readdir($me)) {
+                if ($child != '.' && $child != '..') {
+                    $folder = $dir . DIRECTORY_SEPARATOR . $child;
+                    if ($child == 'rules.php') {
+                        $code = unserialize(file_get_contents($folder));
+                        self::$code_list[basename($dir)] = $code['name'];
+                    }
+                    self::scanDirectory($folder);
+                }
+            }
+            unset($code);
+        }
+
+        return self::$code_list;
     }
 }
