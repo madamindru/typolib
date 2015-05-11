@@ -26,6 +26,7 @@ if (isset($_GET['rule'])) {
     include MODELS . 'inserted.php';
     include VIEWS . 'inserted.php';
 } else {
+    $javascript_include = ['ajax_insert.js'];
     include MODELS . 'insert.php';
     include VIEWS . 'insert.php';
 }

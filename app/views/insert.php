@@ -1,6 +1,14 @@
-
 <form name="addform" id="mainform" method="get" action="">
+<div id="result"></div>
     <fieldset id="main">
+        <?php if (isset($locale_selector)) : ?>
+        <fieldset>
+            <label>Locale</label>
+            <select name="locale" title="Locale" id="locale_selector">
+            <?=$locale_selector?>
+            </select>
+        </fieldset>
+        <?php endif; ?>
 
         <?php if (isset($code_selector)) : ?>
         <fieldset>

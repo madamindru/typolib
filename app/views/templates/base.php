@@ -4,7 +4,6 @@ ob_start();
 
 $javascript_include = isset($javascript_include) ? $javascript_include : [];
 $css_include = isset($css_include) ? $css_include : [];
-
 if (strpos(VERSION, 'dev') !== false) {
     $beta_version = true;
     $title_productname = PRODUCT . ' Beta';
