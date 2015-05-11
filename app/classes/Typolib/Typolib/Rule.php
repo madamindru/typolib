@@ -14,7 +14,12 @@ class Rule
     private $id;
     private $content;
     private $type;
-    private static $rules_type = ['if_then', 'contains', 'string', 'starts_with', 'ends_with'];
+    // FIXME: string?
+    private static $rules_type = ['if_then'     => 'IF […] THEN […]',
+                                  'contains'    => 'CONTAINS […]',
+                                  'string'      => 'STRING',
+                                  'starts_with' => 'STARTS WITH […]',
+                                  'ends_with'   => 'ENDS WITH […]', ];
     private static $ifThenRuleArray = [];
     private static $all_ids = [];
 

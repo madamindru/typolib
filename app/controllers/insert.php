@@ -5,14 +5,14 @@ use Typolib\Exception;
 use Typolib\RepoManager;
 use Typolib\Rule;
 
-$code = new Code('firefox', 'fr');
+$code = new Code('typolib\'', 'fr', true);
 
-$ru = new Rule('firefox', 'fr', 'regle test', 'ifthen');
-$ru1 = new Rule('firefox', 'fr', 'regle numéro 2', 'ifthen');
+$ru = new Rule('firefox', 'fr', 'regle test', 'if_then');
+/*$ru1 = new Rule('firefox', 'fr', 'regle numéro 2', 'ifthen');
 Rule::manageRule('firefox', 'fr', 0, 'update_content', 'test switch');
 $ex = new Exception('firefox', 'fr', 0, 'contenu de l\'exception');
 
-$pr = new RepoManager();
+$pr = new RepoManager();*/
 
 /*
 $file_name = DATA_ROOT . 'typolib-rules/test.php';
