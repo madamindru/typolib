@@ -14,6 +14,7 @@ class Rule
     private $id;
     private $content;
     private $type;
+    private static $rules_type = ['if_then', 'contains', 'string', 'starts_with', 'ends_with'];
     private static $ifThenRuleArray = [];
     private static $all_ids = [];
 
@@ -29,7 +30,7 @@ class Rule
      */
     public function __construct($name_code, $locale_code, $content, $type)
     {
-        if (Code::existCode($name_code, $locale_code)) {
+        if (Code::existCode($name_code, $locale_code) && self::isSupportedType($type)) {
             $this->content = $content;
             $this->type = $type;
             $this->createRule($name_code, $locale_code);
@@ -46,7 +47,7 @@ class Rule
      * @param String $name_code   The code name from which the rule depends.
      * @param String $locale_code The locale code from which the rule depends.
      */
-    public function createRule($name_code, $locale_code)
+    private function createRule($name_code, $locale_code)
     {
         $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
         $code = Rule::getArrayRules($name_code, $locale_code);
@@ -87,7 +88,11 @@ class Rule
                     break;
 
                 case 'update_type':
-                    $code['rules'][$id]['type'] = $value;
+                    if (self::isSupportedType($value)) {
+                        $code['rules'][$id]['type'] = $value;
+                    } else {
+                        return false;
+                    }
                     break;
             }
             file_put_contents($file, serialize($code));
@@ -186,5 +191,26 @@ class Rule
         }
 
         return self::$all_ids;
+    }
+
+    /**
+     * Check if the type of the rule is supported or not
+     *
+     * @param  String  $type The type of the rule we want to check.
+     * @return boolean True if the type is supported.
+     */
+    public static function isSupportedType($type)
+    {
+        return in_array($type, self::$rules_type);
+    }
+
+    /**
+     * Get the list of all the types of rules
+     *
+     * @return array rules_type which contains all the supported types.
+     */
+    public static function getRulesTypeList()
+    {
+        return self::$rules_type;
     }
 }
