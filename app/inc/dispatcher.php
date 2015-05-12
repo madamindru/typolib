@@ -1,5 +1,6 @@
 <?php
 namespace Typolib;
+
 use Transvision\Utils;
 
 // Init locale with browser locale if we support it; first locale we support, otherwise.

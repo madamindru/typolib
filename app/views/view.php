@@ -36,4 +36,5 @@
         <br/>
         <input type="submit" value="Add" alt="Add" />
     </fieldset>
+    <?php include VIEWS . 'rules_treeview.php'; ?>
 </form>
