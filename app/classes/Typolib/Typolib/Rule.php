@@ -1,6 +1,8 @@
 <?php
 namespace Typolib;
 
+use Exception;
+
 /**
  * Rule class
  *
@@ -35,15 +37,18 @@ class Rule
      */
     public function __construct($name_code, $locale_code, $content, $type)
     {
+        $success = false;
+
         if (Code::existCode($name_code, $locale_code) && self::isSupportedType($type)) {
             $this->content = $content;
             $this->type = $type;
             $this->createRule($name_code, $locale_code);
-
-            return true;
+            $success = true;
         }
 
-        return false;
+        if (! $success) {
+            throw new Exception('Rule creation failed.');
+        }
     }
 
     /**
@@ -206,7 +211,7 @@ class Rule
      */
     public static function isSupportedType($type)
     {
-        return in_array($type, self::$rules_type);
+        return array_key_exists($type, self::$rules_type);
     }
 
     /**

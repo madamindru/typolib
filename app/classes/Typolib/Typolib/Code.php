@@ -1,6 +1,8 @@
 <?php
 namespace Typolib;
 
+use Exception;
+
 /**
  * Code class
  *
@@ -29,6 +31,7 @@ class Code
      */
     public function __construct($name, $locale, $common_code_user)
     {
+        $success = false;
         if (Locale::isSupportedLocale($locale)) {
             $this->name = $name;
             $this->locale = $locale;
@@ -36,16 +39,19 @@ class Code
             if ($false_name != 'common') {
                 $this->path = DATA_ROOT . RULES_REPO . "/$this->locale/$false_name";
                 $this->common_code_user = $common_code_user;
-                $this->createCode();
-                if (! is_dir(DATA_ROOT . RULES_REPO . "/$this->locale/common")) {
-                    $this->createCommonCode();
-                }
 
-                return true;
+                if ($this->createCode()) {
+                    if (! is_dir(DATA_ROOT . RULES_REPO . "/$this->locale/common")) {
+                        $this->createCommonCode();
+                    }
+                    $success = true;
+                }
             }
         }
 
-        return false;
+        if (! $success) {
+            throw new Exception('Code creation failed.');
+        }
     }
 
     /**

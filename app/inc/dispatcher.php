@@ -12,15 +12,20 @@ switch ($url['path']) {
         $page_title = 'View rules';
         $page_descr = '';
         break;
-    case 'view':
-        $controller = 'view';
-        $page_title = 'View rules';
-        $page_descr = '';
-        break;
     case 'api':
         $template = false;
         $controller = 'api';
         $show_title = false;
+        break;
+    case 'insert':
+        $controller = 'insert';
+        $page_title = 'Create a code';
+        $page_descr = '';
+        break;
+    case 'view':
+        $controller = 'view';
+        $page_title = 'View rules';
+        $page_descr = '';
         break;
     default:
         $controller = 'view';
