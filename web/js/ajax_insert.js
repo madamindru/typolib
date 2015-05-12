@@ -14,7 +14,7 @@ $('#locale_selector').on('change', function() {
 });
 
 $('#code_selector').on('change', function() {
-    locale = $('#locale_selector').value;
+    locale = $('#locale_selector').val();
     $.ajax({
         url: "api/",
         type: "GET",
