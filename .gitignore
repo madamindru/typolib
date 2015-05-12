@@ -7,3 +7,4 @@ composer.phar
 logs/*.log
 vendor
 web/assets/jquery/
+components/
