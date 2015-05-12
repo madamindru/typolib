@@ -8,13 +8,13 @@ $show_title   = true;
 
 switch ($url['path']) {
     case '/':
-        $controller = 'insert';
-        $page_title = 'Adding new rules';
+        $controller = 'view';
+        $page_title = 'View rules';
         $page_descr = '';
         break;
-    case 'insert':
-        $controller = 'insert';
-        $page_title = 'Adding new rules';
+    case 'view':
+        $controller = 'view';
+        $page_title = 'View rules';
         $page_descr = '';
         break;
     case 'api':
@@ -23,7 +23,7 @@ switch ($url['path']) {
         $show_title = false;
         break;
     default:
-        $controller = 'insert';
+        $controller = 'view';
         $page_title = 'Adding new rules';
         $page_descr = '';
         break;

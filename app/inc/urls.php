@@ -2,6 +2,6 @@
 
 $urls = [
     '/'                   => 'root',
-    'insert'              => 'insert',
+    'view'                => 'view',
     'api'                 => 'api',
 ];
