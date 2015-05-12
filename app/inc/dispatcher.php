@@ -17,6 +17,11 @@ switch ($url['path']) {
         $page_title = 'Adding new rules';
         $page_descr = '';
         break;
+    case 'api':
+        $template = false;
+        $controller = 'api';
+        $show_title = false;
+        break;
     default:
         $controller = 'insert';
         $page_title = 'Adding new rules';
