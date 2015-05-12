@@ -1,5 +1,10 @@
 <?php
-namespace Transvision;
+namespace Typolib;
+use Transvision\Utils;
+
+// Init locale with browser locale if we support it; first locale we support, otherwise.
+$l10n = new \tinyl10n\ChooseLocale(Locale::getLocaleList());
+$locale = $l10n->getCompatibleLocale();
 
 $template     = true;
 $page         = $urls[$url['path']];
