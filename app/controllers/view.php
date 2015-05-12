@@ -22,11 +22,6 @@ file_put_contents($file_name, "Règle 1\nRègle 2\n");
 $pr->commitAndPush();
 */
 
-if (isset($_GET['rule'])) {
-    include MODELS . 'inserted.php';
-    include VIEWS . 'inserted.php';
-} else {
-    $javascript_include = ['ajax_insert.js'];
-    include MODELS . 'insert.php';
-    include VIEWS . 'insert.php';
-}
+$javascript_include = ['ajax_insert.js'];
+include MODELS . 'view.php';
+include VIEWS . 'view.php';
