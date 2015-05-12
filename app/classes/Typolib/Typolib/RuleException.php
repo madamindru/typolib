@@ -1,15 +1,17 @@
 <?php
 namespace Typolib;
 
+use Exception;
+
 /**
- * Exception class
+ * RuleException class
  *
  * This class provides methods to manage an exception: create, delete or update,
  * check if an exception exists and get all the exceptions for a specific code.
  *
  * @package Typolib
  */
-class Exception
+class RuleException
 {
     private $id;
     private $content;
@@ -27,16 +29,20 @@ class Exception
      */
     public function __construct($code_name, $code_locale, $rule_id, $content)
     {
+        $success = false;
+
         $code = Rule::getArrayRules($code_name, $code_locale);
         if ($code != null && Rule::existRule($code, $rule_id)) {
             $this->content = $content;
             $this->rule_id = $rule_id;
             $this->createException($code_name, $code_locale);
 
-            return true;
+            $success = true;
         }
 
-        return false;
+        if (! $success) {
+            throw new Exception('Exception creation failed.');
+        }
     }
 
     /**
@@ -49,7 +55,7 @@ class Exception
     private function createException($code_name, $code_locale)
     {
         $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
-        $exception = Exception::getArrayExceptions($code_name, $code_locale);
+        $exception = self::getArrayExceptions($code_name, $code_locale);
         $exception['exceptions'][] = ['rule_id' => $this->rule_id,
                                       'content' => $this->content, ];
 
@@ -75,8 +81,8 @@ class Exception
     {
         $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
 
-        $exception = Exception::getArrayExceptions($code_name, $code_locale);
-        if ($exception != null && Exception::existException($exception, $id)) {
+        $exception = self::getArrayExceptions($code_name, $code_locale);
+        if ($exception != null && self::existException($exception, $id)) {
             switch ($action) {
                 case 'delete':
                     unset($exception['exceptions'][$id]);
