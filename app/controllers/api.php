@@ -13,10 +13,14 @@ $locale = $_GET['locale'];
 
 switch ($_GET['action']) {
     case 'codes':
-        echo Utils::getHtmlSelectOptions(Code::getCodeList($locale), Code::getCodeList($locale)[0], true);
+        $codes = Code::getCodeList($locale);
+        reset($codes);
+        echo Utils::getHtmlSelectOptions(Code::getCodeList($locale), key($codes), true);
         break;
     case 'rules':
         $code = $_GET['code'];
-        echo json_encode(Rule::getArrayRules($code, $locale));
+        $rules = Rule::getArrayRules($code, $locale);
+        $ruletypes = Rule::getRulesTypeList();
+        include VIEWS . 'rules_treeview.php';
     break;
 }
