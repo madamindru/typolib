@@ -90,12 +90,13 @@ class Code
      */
     private function createCommonCode()
     {
+        $code = ['name' => 'common'];
         if (Locale::isSupportedLocale($this->locale)) {
             $path = DATA_ROOT . RULES_REPO . "/$this->locale/common";
             if (! file_exists($path)) {
                 mkdir($path, 0777, true);
 
-                file_put_contents($path . '/rules.php', '');
+                file_put_contents($path . '/rules.php', serialize($code));
                 file_put_contents($path . '/exceptions.php', '');
 
                 return true;
