@@ -14,26 +14,35 @@ class Code
     private $name;
     private $locale;
     private $path;
+    private $common_code_user;
     private static $code_list = [];
 
     /**
      * Constructor that initializes all the arguments then call the method
      * to create the code if the locale is supported.
      *
-     * @param  String  $name   The name of the new code.
-     * @param  String  $locale The locale of the new code.
+     * @param  String  $name             The name of the new code.
+     * @param  String  $locale           The locale of the new code.
+     * @param  boolean $common_code_user True if the code must use the common
+     *                                   code of the locale
      * @return boolean True if the code has been created.
      */
-    public function __construct($name, $locale)
+    public function __construct($name, $locale, $common_code_user)
     {
         if (Locale::isSupportedLocale($locale)) {
             $this->name = $name;
             $this->locale = $locale;
             $false_name = Utils::sanitizeFileName($this->name);
-            $this->path = DATA_ROOT . RULES_REPO . "/$this->locale/$false_name";
-            $this->createCode();
+            if ($false_name != 'common') {
+                $this->path = DATA_ROOT . RULES_REPO . "/$this->locale/$false_name";
+                $this->common_code_user = $common_code_user;
+                $this->createCode();
+                if (! is_dir(DATA_ROOT . RULES_REPO . "/$this->locale/common")) {
+                    $this->createCommonCode();
+                }
 
-            return true;
+                return true;
+            }
         }
 
         return false;
@@ -49,6 +58,8 @@ class Code
         if (! file_exists($this->path)) {
             $code = ['name' => $this->name];
 
+            $this->common_code_user ? $code['common'] = true : $code['common'] = false;
+
             // Maybe it's just a new file, but maybe the repo has not been cloned.
             // We need to make sure the repo is cloned before creating this directory.
             if (! is_dir(DATA_ROOT . RULES_REPO)) {
@@ -60,6 +71,29 @@ class Code
             file_put_contents($this->path . '/exceptions.php', '');
 
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates the common code, its directory and its files (rules.php
+     * and exceptions.php).
+     *
+     * @return boolean True if the code doesn't exist and has been created.
+     */
+    private function createCommonCode()
+    {
+        if (Locale::isSupportedLocale($this->locale)) {
+            $path = DATA_ROOT . RULES_REPO . "/$this->locale/common";
+            if (! file_exists($path)) {
+                mkdir($path, 0777, true);
+
+                file_put_contents($path . '/rules.php', '');
+                file_put_contents($path . '/exceptions.php', '');
+
+                return true;
+            }
         }
 
         return false;
@@ -102,9 +136,13 @@ class Code
      */
     public static function getCodeList($locale)
     {
-        $dir = DATA_ROOT . RULES_REPO . "/$locale";
+        if (Locale::isSupportedLocale($locale)) {
+            $dir = DATA_ROOT . RULES_REPO . "/$locale";
 
-        return self::scanDirectory($dir);
+            return self::scanDirectory($dir);
+        } else {
+            return false;
+        }
     }
 
     /**
