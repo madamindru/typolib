@@ -21,7 +21,7 @@ $('#code_selector').on('change', function() {
         data: "action=rules&locale=" + locale + "&code=" + this.value,
         dataType: "html",
         success: function(response) {
-            $("#result").html(response);
+            $("#results").html(response);
         },
         error: function() {
             console.log("AJAX failure - get rules");
@@ -34,12 +34,14 @@ $('#addrule_type').on('change', function() {
     $('#rule').val(rule_type);
 });
 
-$('#mainform').submit(function(event) {
+$('#submitRule').click(function(event) {
     event.preventDefault();
     code = $('#code_selector').val();
     locale = $('#locale_selector').val();
     rule_type = $('#addrule_type').val();
     rule = $('#rule').val();
+    placeholder = $('#addrule_type :selected').text();
+    $('#rule').val(placeholder);
     $.ajax({
         url: "api/",
         type: "GET",
