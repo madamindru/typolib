@@ -28,3 +28,28 @@ $('#code_selector').on('change', function() {
         }
     });
 });
+
+$('#addrule_type').on('change', function() {
+    rule_type = $('#addrule_type :selected').text();
+    $('#rule').val(rule_type);
+});
+
+$('#mainform').submit(function(event) {
+    event.preventDefault();
+    code = $('#code_selector').val();
+    locale = $('#locale_selector').val();
+    rule_type = $('#addrule_type').val();
+    rule = $('#rule').val();
+    $.ajax({
+        url: "api/",
+        type: "GET",
+        data: "action=adding_rule&locale=" + locale + "&code=" + code + "&type=" + rule_type + "&content=" + rule,
+        dataType: "html",
+        success: function(response) {
+            $("#results").html(response);
+        },
+        error: function() {
+            console.log("AJAX failure - add rule");
+        }
+    });
+});

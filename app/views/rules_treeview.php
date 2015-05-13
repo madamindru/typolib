@@ -1,6 +1,7 @@
 <div class="treeview">
     <ul>
 <?php
+
     $type_number = 0;
     // Level 1: display all rule types
     foreach ($ruletypes as $id_type => $pretty_name) :
@@ -26,8 +27,22 @@
                                 <?=$rule['content']?>
                             </label>
                             <ul>
-                                <?php // Level 3: display all exceptions for each rule ?>
-                                <li><a href="./">Exception 1</a></li>
+                                <?php
+                                    $exception_number = 0;
+                                    // Level 3: display all exceptions for each rule
+                                    if (isset($rule_exceptions['exceptions'])) :
+                                        foreach ($rule_exceptions['exceptions'] as $id_exception => $exception) :
+                                            if (isset($exception['rule_id']) && $exception['rule_id'] == $id_rule) :
+                                                $exception_number++;
+                                ?>
+                                <li><a href="./"><?=$exception['content']?></a></li>
+
+                        <?php
+                                    endif;
+                                endforeach; // End level 3
+                            endif;
+                        ?>
+
                             </ul>
                         </li>
         <?php

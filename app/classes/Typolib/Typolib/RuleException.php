@@ -108,7 +108,7 @@ class RuleException
      * @param  integer $id        The identity of the exception we search.
      * @return boolean True if the exception exists
      */
-    private static function existException($exception, $id)
+    public static function existException($exception, $id)
     {
         return array_key_exists($id, $exception['exceptions']);
     }
@@ -119,7 +119,7 @@ class RuleException
      * @param String $code_name   The code name from which the exceptions depend.
      * @param String $code_locale The locale code from which the exceptions depend.
      */
-    private static function getArrayExceptions($code_name, $code_locale)
+    public static function getArrayExceptions($code_name, $code_locale)
     {
         if (Code::existCode($code_name, $code_locale)) {
             $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";

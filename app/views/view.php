@@ -1,5 +1,5 @@
 <form name="addform" id="mainform" method="get" action="">
-<div id="result"></div>
+
     <fieldset id="main">
         <?php if (isset($locale_selector)) : ?>
         <fieldset>
@@ -31,10 +31,10 @@
         <br/>
         <fieldset>
             <p>Enter a new rule:<br />
-            <input type="text" name="rule"/></p>
+            <input type="text" name="rule" id="rule" value="<?=$first_rule;?>"/></p>
         </fieldset>
         <br/>
-        <input type="submit" value="Add" alt="Add" />
+        <input type="submit" id="submitRule" value="Add" alt="Add" />
     </fieldset>
-    <?php include VIEWS . 'rules_treeview.php'; ?>
+    <div id="results"><?php include VIEWS . 'rules_treeview.php'; ?></div>
 </form>
