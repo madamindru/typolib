@@ -1,5 +1,7 @@
 <?php
+namespace Typolib;
 
+Code::editCodeName('test', 'test2', 'fr', true);
 
 if (isset($_GET['locale'])) {
     include MODELS . 'inserted.php';
