@@ -21,6 +21,24 @@ switch ($_GET['action']) {
         $code = $_GET['code'];
         $rules = Rule::getArrayRules($code, $locale);
         $ruletypes = Rule::getRulesTypeList();
+        $rule_exceptions = RuleException::getArrayExceptions($code, $locale);
+        include VIEWS . 'rules_treeview.php';
+    break;
+    case 'adding_rule':
+        $code = $_GET['code'];
+        $type = $_GET['type'];
+        $content = $_GET['content'];
+
+        if ($content != '') {
+            try {
+                $new_rule = new Rule($code, $locale, $content, $type);
+            } catch (Exception $e) {
+            }
+        }
+
+        $rules = Rule::getArrayRules($code, $locale);
+        $ruletypes = Rule::getRulesTypeList();
+        $rule_exceptions = RuleException::getArrayExceptions($code, $locale);
         include VIEWS . 'rules_treeview.php';
     break;
 }
