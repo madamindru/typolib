@@ -27,6 +27,7 @@
             </select>
         </fieldset>
         <?php endif; ?>
+        <input type="submit" name="edit_code" value="Edit" alt="Edit" />
 
         <br/>
         <fieldset>

@@ -21,7 +21,7 @@ $('#code_selector').on('change', function() {
         data: "action=rules&locale=" + locale + "&code=" + this.value,
         dataType: "html",
         success: function(response) {
-            $("#results").html(response);
+            $("#result").html(response);
         },
         error: function() {
             console.log("AJAX failure - get rules");
