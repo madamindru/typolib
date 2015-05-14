@@ -23,6 +23,10 @@ class Rule
                                   'starts_with' => 'STARTS WITH […]',
                                   'ends_with'   => 'ENDS WITH […]', ];
     private static $ifThenRuleArray = [];
+    private static $variable_to_ignore_array = [];
+    private static $start_variable_tag = '<-';
+    private static $end_variable_tag = '->';
+    private static $plural_separator_array = [];
     private static $all_ids = [];
 
     /**
@@ -162,6 +166,94 @@ class Rule
         foreach (self::$ifThenRuleArray as $key => $value) {
             echo "Input character: $key => New character: $value<br />\n";
         }
+    }
+
+    /**
+     * Check a "if x then y" rule (just for ellipsis character)
+     * TODO : generic method for any character of the ifThen rule array
+     *
+     * @param string      $userString the string entered by the user
+     * @param string      $search     the searched character in $userString to replace
+     * @param string enum $mode       the mode used by the user (list of errors or text corrected)
+     */
+    public function checkIfThenRuleEllipsis($userString, $mode)
+    {
+        $mystring = "Yes ... that's true, but ...";
+        $search = '/\.{3}/'; // equivalent to ...
+        $search2 = '...';
+        $replace = '&#8230;'; // ellipsis character
+        $errors_beginning = [];
+        $is_matched = false;
+        $i = 0;
+
+        do {
+            $is_matched = false;
+            if (strpos($mystring, $search2) !== false) {
+                $errors_beginning[$i] = strpos($mystring, $search2);
+                $i = $i + 1;
+                $mystring = preg_replace($search, $replace, $mystring, 1);
+
+                $is_matched = true;
+            }
+        } while ($is_matched);
+
+        if ($mode == "ERROR_LIST") {
+            return $errors_beginning;
+        }
+
+        if ($mode == "CORRECTED_TEXT") {
+            return $mystring;
+        }
+    }
+
+    /**
+     * Add a variable to the global array of variables to ignore
+     *
+     * @param string $userString the string entered by the user
+     */
+    public function addRuleToVariableToIgnoreArray($userString)
+    {
+        self::$variable_to_ignore_array[$userString] = self::$start_variable_tag . $userString . self::$end_variable_tag;
+    }
+
+    /**
+     * Display all the rules of the global array of variables to ignore
+     */
+    public static function displayVariableToIgnoreArray()
+    {
+        foreach (self::$variable_to_ignore_array as $key => $value) {
+            echo "Variable to ignore: $key<br />\n";
+        }
+    }
+
+    /**
+     * Add a separator to the global array of plural separators
+     *
+     * @param string $userString the string entered by the user
+     */
+    public function addRuleToPluralSeparatorArray($userString)
+    {
+        self::$plural_separator_array[] = $userString;
+    }
+
+    /**
+     * Display all the rules of the global array of plural separators
+     */
+    public static function displayPluralSeparatorArray()
+    {
+        foreach (self::$plural_separator_array as $key => $value) {
+            echo "Plural separator: $value<br />\n";
+        }
+    }
+
+    /**
+     * Ignore all the variables of the variable_to_ignore_array in the user string
+     *
+     * @param string $userString the string entered by the user
+     */
+    public static function ignoreVariables($userString)
+    {
+        strtr($userString, $variable_to_ignore_array);
     }
 
     /**
