@@ -215,6 +215,24 @@ footer {
     line-height: 0.4;
 }
 
+#success,
+#errors {
+    border: 3px solid rgba(0, 0, 0, 0.5);
+    padding: 30px;
+    margin: 30px auto;
+    width: 70%;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+#success {
+    background-color: #9bce9f;
+}
+
+#errors {
+    background-color: #e17f7f;
+}
+
 /* Main form */
 
 #mainform {

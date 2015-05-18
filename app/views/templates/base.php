@@ -46,6 +46,26 @@ if (strpos(VERSION, 'dev') !== false) {
     <h3 id="page-descrition"><?=$page_descr?></h3>
     <?php endif; ?>
 
+    <?php if (array_filter($success)): ?>
+    <div id="success">
+        <ul>
+        <?php foreach ($success as $s) : ?>
+            <li><?=$s?></li>
+        <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php endif; ?>
+
+    <?php if (array_filter($errors)): ?>
+    <div id="errors">
+        <ul>
+        <?php foreach ($errors as $error) : ?>
+            <li><?=$error?></li>
+        <?php endforeach; ?>
+        </ul>
+    </div>
+    <?php endif; ?>
+
     <div id="page-content">
       <?=$extra?>
       <?=$content?>
