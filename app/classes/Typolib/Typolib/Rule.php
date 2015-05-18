@@ -16,6 +16,7 @@ class Rule
     private $id;
     private $content;
     private $type;
+    private $comment;
     // FIXME: string?
     private static $rules_type = ['if_then'     => 'IF […] THEN […]',
                                   'contains'    => 'CONTAINS […]',
@@ -37,15 +38,17 @@ class Rule
      * @param  String  $locale_code The locale code from which the rule depends.
      * @param  String  $content     The content of the new rule.
      * @param  String  $type        The type of the new rule.
+     * @param  String  $comment     The comment of the new rule.
      * @return boolean True if the rule has been created.
      */
-    public function __construct($name_code, $locale_code, $content, $type)
+    public function __construct($name_code, $locale_code, $content, $type, $comment = '')
     {
         $success = false;
 
         if (Code::existCode($name_code, $locale_code) && self::isSupportedType($type)) {
             $this->content = $content;
             $this->type = $type;
+            $this->comment = $comment;
             $this->createRule($name_code, $locale_code);
             $success = true;
         }
@@ -65,11 +68,18 @@ class Rule
     {
         $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
         $code = Rule::getArrayRules($name_code, $locale_code);
-        $code['rules'][] = ['content' => $this->content, 'type' => $this->type];
+        $code['rules'][] = [
+                                'content' => $this->content,
+                                'type'    => $this->type,
+                            ];
 
         //Get the last inserted id
         end($code['rules']);
         $this->id = key($code['rules']);
+
+        if ($this->comment != '') {
+            $code['rules'][$this->id]['comment'] = $this->comment;
+        }
 
         file_put_contents($file, serialize($code));
     }
@@ -80,8 +90,8 @@ class Rule
      * @param  String  $name_code   The code name from which the rule depends.
      * @param  String  $locale_code The locale code from which the rule depends.
      * @param  integer $id          The identity of the rule.
-     * @param  String  $action      The action to perform: 'delete', 'update_content'
-     *                              or 'update_type'.
+     * @param  String  $action      The action to perform: 'delete', 'update_content',
+     *                              'update_type' or 'update_comment'.
      * @param  String  $value       The new content or type of the rule. If action
      *                              is 'delete' the value must be empty.
      * @return boolean True if the function succeeds.
@@ -107,6 +117,9 @@ class Rule
                     } else {
                         return false;
                     }
+                    break;
+                case 'update_comment':
+                    $code['rules'][$id]['comment'] = $value;
                     break;
             }
             file_put_contents($file, serialize($code));
