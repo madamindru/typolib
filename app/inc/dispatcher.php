@@ -28,6 +28,11 @@ switch ($url['path']) {
         $page_title = 'Create a code';
         $page_descr = '';
         break;
+    case 'test':
+        $view       = 'test';
+        $page_title = 'Test page';
+        $page_descr = 'This is a page for test purposes only.';
+        break;
     case 'view':
         $controller = 'view';
         $page_title = 'View rules';
