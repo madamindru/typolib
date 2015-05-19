@@ -40,12 +40,14 @@ $('#submitRule').click(function(event) {
     locale = $('#locale_selector').val();
     rule_type = $('#addrule_type').val();
     rule = $('#rule').val();
+    comment = $('#comment').val();
     placeholder = $('#addrule_type :selected').text();
     $('#rule').val(placeholder);
+    $('#comment').val('');
     $.ajax({
         url: "api/",
         type: "GET",
-        data: "action=adding_rule&locale=" + locale + "&code=" + code + "&type=" + rule_type + "&content=" + rule,
+        data: "action=adding_rule&locale=" + locale + "&code=" + code + "&type=" + rule_type + "&content=" + rule + "&comment=" + comment,
         dataType: "html",
         success: function(response) {
             $("#results").html(response);
