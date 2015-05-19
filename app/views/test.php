@@ -4,6 +4,7 @@ namespace Typolib;
 /* Test something here */
 $locales = Locale::getLocaleList();
 dump($locales);
+
 ?>
 
 <form id="mainform">

@@ -15,7 +15,8 @@
         "fabpot/php-cs-fixer": "~1.4",
         "bit3/git-php": "~1",
         "knplabs/github-api": "~1.2",
-        "components/jquery": "~1.11"
+        "components/jquery": "~1.11",
+        "zf1/zend-translate": "~1.12"
     },
 
     "autoload": {
