@@ -28,10 +28,11 @@ switch ($_GET['action']) {
         $code = $_GET['code'];
         $type = $_GET['type'];
         $content = $_GET['content'];
+        $comment = $_GET['comment'];
 
         if ($content != '') {
             try {
-                $new_rule = new Rule($code, $locale, $content, $type);
+                $new_rule = new Rule($code, $locale, $content, $type, $comment);
             } catch (Exception $e) {
             }
         }

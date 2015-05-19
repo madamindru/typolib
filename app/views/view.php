@@ -34,6 +34,13 @@
             <p>Enter a new rule:<br />
             <input type="text" name="rule" id="rule" value="<?=$first_rule;?>"/></p>
         </fieldset>
+
+        <br/>
+        <fieldset>
+            <p>Enter a comment:<br />
+            <input type="text" name="comment" id="comment"/></p>
+        </fieldset>
+
         <br/>
         <input type="submit" id="submitRule" value="Add" alt="Add" />
     </fieldset>
