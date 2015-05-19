@@ -127,4 +127,14 @@ class RuleException
             return unserialize(file_get_contents($file));
         }
     }
+
+    /**
+     * Get the ID of the newly created exception.
+     *
+     * @return integer $id The identity ID
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 }

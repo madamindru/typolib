@@ -28,7 +28,7 @@
         </fieldset>
         <?php endif; ?>
 
-        <a href="/insert" class="button" role="button">Insert</a>
+        <a href="/insert" class="button button-green" role="button">Add</a>
         <input type="submit" name="edit_code" value="Edit" alt="Edit" />
         <input type="submit" name="delete_code" value="Delete" alt="Delete" />
 
@@ -47,5 +47,5 @@
         <br/>
         <input type="submit" id="submitRule" value="Add" alt="Add" />
     </fieldset>
-    <div id="results"><?php include VIEWS . 'rules_treeview.php'; ?></div>
+    <div id="results"><?php include VIEWS . 'view_treeview.php'; ?></div>
 </form>

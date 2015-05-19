@@ -23,6 +23,18 @@
     opacity: 0;
 }
 
+.treeview .exceptions input
+{
+    position: relative;
+    min-width: 0;
+    margin: 0 0 0 20px;
+}
+
+.treeview .exceptions li:hover .button
+{
+    opacity: 1;
+}
+
 .treeview
 {
     -moz-user-select: none;
@@ -102,6 +114,19 @@
 {
     background-position: 0 -16px;
 }
+
+/* Overrides for the Exception form */
+
+.treeview #exceptionview input
+{
+    position: relative;
+    opacity: 1;
+}
+
+.treeview #exceptionview .button {
+    margin: 0 0 0 10px;
+}
+
 
 /* webkit adjacent element selector bugfix */
 @media screen and (-webkit-min-device-pixel-ratio:0)
