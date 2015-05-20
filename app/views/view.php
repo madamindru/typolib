@@ -27,7 +27,10 @@
             </select>
         </fieldset>
         <?php endif; ?>
+
+        <a href="/insert" class="button" role="button">Insert</a>
         <input type="submit" name="edit_code" value="Edit" alt="Edit" />
+        <input type="submit" name="delete_code" value="Delete" alt="Delete" />
 
         <br/>
         <fieldset>
