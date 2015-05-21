@@ -105,6 +105,14 @@ class Rule
             switch ($action) {
                 case 'delete':
                     unset($code['rules'][$id]);
+
+                    //delete all the exceptions for the rule.
+                    $rule_exceptions = self::getArrayRuleExceptions($name_code, $locale_code, $id);
+                    if ($rule_exceptions != false) {
+                        foreach ($rule_exceptions as $id_exception => $content) {
+                            RuleException::manageException($name_code, $locale_code, $id_exception, 'delete');
+                        }
+                    }
                     break;
 
                 case 'update_content':
@@ -155,6 +163,33 @@ class Rule
 
             return unserialize(file_get_contents($file));
         }
+    }
+
+    /**
+     * Get an array of all the exceptions for a specific rule.
+     *
+     * @param String $name_code   The code name from which the exceptions depend.
+     * @param String $locale_code The locale code from which the exceptions depend.
+     * @param String $id          The rule id from which the exceptions depend.
+     */
+    public static function getArrayRuleExceptions($name_code, $locale_code, $id)
+    {
+        $code = Rule::getArrayRules($name_code, $locale_code);
+        if ($code != null && Rule::existRule($code, $id)) {
+            $rule_exceptions = RuleException::getArrayExceptions($name_code, $locale_code);
+
+            if ($rule_exceptions != false) {
+                foreach ($rule_exceptions['exceptions'] as $id_exception => $exception) {
+                    if ($exception['rule_id'] == $id) {
+                        $array[$id_exception] = $exception['content'];
+                    }
+                }
+
+                return $array;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -126,6 +126,8 @@ class RuleException
 
             return unserialize(file_get_contents($file));
         }
+
+        return false;
     }
 
     /**
