@@ -89,6 +89,9 @@ a:hover {
     color: #00539f;
     text-decoration: underline;
 }
+a.button {
+    color: #fff;
+}
 
 #beta-badge {
     position: absolute;
@@ -327,6 +330,17 @@ textarea {
     padding: 0 3px;
 }
 
+#exceptionview fieldset,
+#exceptionview input[type="text"] {
+    padding-left: 0;
+    margin-left: 0;
+}
+
+/* Helpers */
+
+.bold {
+    font-weight: bold;
+}
 
 /* Responsive */
 

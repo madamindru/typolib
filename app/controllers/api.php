@@ -1,8 +1,6 @@
 <?php
 namespace Typolib;
 
-use Transvision\Utils;
-
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
 header('Access-Control-Max-Age: 1000');
@@ -10,36 +8,13 @@ header('Access-Control-Allow-Headers: Content-Type');
 header('Content-type: text/html; charset=utf-8');
 
 $locale = $_GET['locale'];
+$code = $_GET['code'];
 
-switch ($_GET['action']) {
-    case 'codes':
-        $codes = Code::getCodeList($locale);
-        reset($codes);
-        echo Utils::getHtmlSelectOptions(Code::getCodeList($locale), key($codes), true);
-        break;
-    case 'rules':
-        $code = $_GET['code'];
-        $rules = Rule::getArrayRules($code, $locale);
-        $ruletypes = Rule::getRulesTypeList();
-        $rule_exceptions = RuleException::getArrayExceptions($code, $locale);
-        include VIEWS . 'rules_treeview.php';
-    break;
-    case 'adding_rule':
-        $code = $_GET['code'];
-        $type = $_GET['type'];
-        $content = $_GET['content'];
-        $comment = $_GET['comment'];
+// We must only allow those files, otherwise, any .php file on the server could be
+// included below.
+$models = ['get_codes', 'get_rules', 'adding_rule', 'adding_exception',
+           'deleting_rule', 'deleting_exception', ];
 
-        if ($content != '') {
-            try {
-                $new_rule = new Rule($code, $locale, $content, $type, $comment);
-            } catch (Exception $e) {
-            }
-        }
-
-        $rules = Rule::getArrayRules($code, $locale);
-        $ruletypes = Rule::getRulesTypeList();
-        $rule_exceptions = RuleException::getArrayExceptions($code, $locale);
-        include VIEWS . 'rules_treeview.php';
-    break;
+if (in_array($_GET['action'], $models)) {
+    include MODELS . 'api/' . $_GET['action'] . '.php';
 }
