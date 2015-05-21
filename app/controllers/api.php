@@ -13,7 +13,7 @@ $code = $_GET['code'];
 // We must only allow those files, otherwise, any .php file on the server could be
 // included below.
 $models = ['get_codes', 'get_rules', 'adding_rule', 'adding_exception',
-           'deleting_exception', ];
+           'deleting_rule', 'deleting_exception', ];
 
 if (in_array($_GET['action'], $models)) {
     include MODELS . 'api/' . $_GET['action'] . '.php';

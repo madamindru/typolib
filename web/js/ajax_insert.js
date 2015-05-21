@@ -1,6 +1,6 @@
 function clickHandlers() {
-    jQuery("a.new-exception").unbind('click');
-    jQuery("a.new-exception").click(function(event){
+    $("a.new-exception").unbind('click');
+    $("a.new-exception").click(function(event){
         event.preventDefault();
         // Make sure the form is displayed
         $('#exceptionview').show();
@@ -15,8 +15,34 @@ function clickHandlers() {
         $('#exceptionview').detach().appendTo($(this).parent());
     });
 
-    jQuery(".delete-exception").unbind('click');
-    jQuery(".delete-exception").click(function(event) {
+
+    $(".delete-rule").unbind('click');
+    $(".delete-rule").click(function(event) {
+        code = $('#code_selector').val();
+        locale = $('#locale_selector').val();
+        var li = $(this).parent();
+        id_rule = li.find('.rule').data('id-rule');
+        $.ajax({
+            url: "api/",
+            type: "GET",
+            data: "action=deleting_rule&locale=" + locale + "&code=" + code + "&id_rule=" + id_rule,
+            dataType: "html",
+            context: this,
+            success: function(response) {
+                if (response == "1") {
+                    $(this).parent().remove();
+                } else {
+                    alert("Sorry, something went wrong while deleting this rule. Try again later.");
+                }
+            },
+            error: function() {
+                console.error("AJAX failure - delete rule");
+            }
+        });
+    });
+
+    $(".delete-exception").unbind('click');
+    $(".delete-exception").click(function(event) {
         code = $('#code_selector').val();
         locale = $('#locale_selector').val();
         var li = $(this).parent();
@@ -31,16 +57,17 @@ function clickHandlers() {
             context: this,
             success: function(response) {
                 if (response == "1") {
-                    $(this).parent().hide();
+                    $(this).parent().remove();
                 } else {
                     alert("Sorry, something went wrong while deleting this exception. Try again later.");
                 }
             },
             error: function() {
-                console.error("AJAX failure - delete rule");
+                console.error("AJAX failure - delete exception");
             }
         });
     });
+
 
     $('#submitRuleException').unbind('click');
     $('#submitRuleException').click(function(event) {

@@ -11,20 +11,20 @@
             <label for="item-<?=$type_number;?>">
                 <?=$pretty_name?>
             </label>
-            <ul>
+            <ul class="rules">
         <?php
             $rule_number = 0;
             // Level 2: display all rules for each type
             if (isset($rules['rules'])) :
                 foreach ($rules['rules'] as $id_rule => $rule) :
                     if (isset($rule['type']) && $rule['type'] == $id_type) :
-
         ?>
                         <li>
                             <input type="checkbox" id="item-<?=$type_number;?>-<?=$rule_number;?>" />
-                            <label for="item-<?=$type_number;?>-<?=$rule_number;?>" class="rule" data-id-rule="<?=$rule_number;?>">
+                            <label for="item-<?=$type_number;?>-<?=$rule_number;?>" class="rule" data-id-rule="<?=$id_rule;?>">
                                 <?=$rule['content']?>
                             </label>
+                            <input type="button" class="button button-negative delete-rule" value="×">
                             <ul class="exceptions">
                                 <?php
                                     $exception_number = 0;
