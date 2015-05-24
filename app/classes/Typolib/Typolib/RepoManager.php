@@ -48,13 +48,13 @@ class RepoManager
      */
     public function __construct(array $args = null)
     {
-        $this->repo  = isset($args['repo']) ? $args['repo'] : RULES_REPO;
+        $this->repo  = isset($args['repo']) ? $args['repo'] : RULES_STAGING;
 
         $github_url  = 'https://github.com/' . urlencode(TYPOLIB_GITHUB_ACCOUNT)
                      . '/' . $this->repo . '.git';
         $remote_url  = 'https://' . urlencode(CLIENT_GITHUB_ACCOUNT)
                      . ':' . urlencode(CLIENT_GITHUB_PASSWORD)
-                     . '@github.com/' . urlencode(CLIENT_GITHUB_ACCOUNT)
+                     . '@github.com/' . urlencode(TYPOLIB_GITHUB_ACCOUNT)
                      . '/' . $this->repo . '.git';
         $path        = DATA_ROOT . $this->repo . '/';
         $update_file = DATA_ROOT . 'lastupdate.txt';
