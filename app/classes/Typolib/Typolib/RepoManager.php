@@ -29,7 +29,7 @@ class RepoManager
     private $user_config;
     private $our_remote = 'origin';
     private $client = null;
-    private $client_remote = 'github';
+    private $client_remote = 'origin';
     private $remote_url;
     private $branch;
     private $branch_prefix = 'typolib-';
@@ -59,7 +59,7 @@ class RepoManager
         $path        = DATA_ROOT . $this->repo . '/';
         $update_file = DATA_ROOT . 'lastupdate.txt';
 
-        $this->branch      = isset($args['branch'])      ? $args['branch']      : '';
+        $this->branch      = isset($args['branch'])      ? $args['branch']      : 'master';
         $this->repo_url    = isset($args['repo_url'])    ? $args['repo_url']    : $github_url;
         $this->remote_url  = isset($args['remote_url'])  ? $args['remote_url']  : $remote_url;
         $this->path        = isset($args['path'])        ? $args['path']        : $path;
@@ -94,7 +94,11 @@ class RepoManager
             $this->logger->error('Failed to initialize Git repository. Error: '
                                  . $e->getMessage());
         }
-        $this->cloneAndConfig();
+
+        // If repo already exists, check for updates.
+        if (! $this->cloneAndConfig()) {
+            $this->checkForUpdates();
+        }
     }
 
     /**
@@ -127,7 +131,8 @@ class RepoManager
     }
 
     /**
-     *  Clone and setup a fresh Git repo if the folder is empty.
+     * Clone and setup a fresh Git repo if the folder is empty.
+     * @return boolean Returns true if repo was not cloned, false if already exists.
      */
     private function cloneAndConfig()
     {
@@ -143,6 +148,7 @@ class RepoManager
                                     )->execute();
 
                 $this->git->fetch()->execute($this->client_remote);
+                $this->git->checkout()->execute('master');
 
                 if (! file_put_contents($this->config_file,
                                         $this->user_config, FILE_APPEND)) {
@@ -152,6 +158,10 @@ class RepoManager
                 $this->logger->error('Failed to clone or config Git repository. '
                                    . 'Error: ' . $e->getMessage());
             }
+
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -163,8 +173,9 @@ class RepoManager
      */
     public function updateMaster()
     {
-        $this->git->fetch()->execute($this->our_remote, 'master');
-        $this->git->checkout()->execute($this->our_remote . '/master');
+        $this->git->fetch()->execute($this->client_remote, 'master');
+        $this->git->checkout()->execute($this->client_remote . '/master');
+        dump("plop");
         $sha = $this->getMasterSha();
         if (! file_put_contents($sha, $this->update_file)) {
             $this->logger->error('Can\'t write ' . $this->update_file . ' file');
@@ -206,14 +217,14 @@ class RepoManager
      */
     public function checkForUpdates()
     {
-        $local_sha = file_get_contents($this->update_file);
+        //$local_sha = file_get_contents($this->update_file);
         $remote_sha = $this->getMasterSha();
 
-        if ($local_sha != $remote_sha) {
+        //if ($local_sha != $remote_sha) {
             $this->updateMaster();
 
-            return true;
-        }
+        return true;
+        //}
 
         return false;
     }
@@ -304,6 +315,7 @@ class RepoManager
         $this->commit_msg = $commit_msg;
         try {
             // Add files to git index, commit and push to client remote
+            //$this->git->checkout()->execute($this->client_remote . '/master');
             $this->git->add()->all()->execute();
             $this->git->commit()->message($this->commit_msg)->execute();
             $this->git->push()->execute($this->client_remote, $this->branch);
@@ -311,8 +323,6 @@ class RepoManager
             $this->logger->error('Failed to commit to Git repository. Error: '
                                  . $e->getMessage());
         }
-
-        $this->createPullRequest();
     }
 
     /**
@@ -335,7 +345,7 @@ class RepoManager
      * Creates a pull request using the current branch committed and pushed.
      * Requires authentication to the client GitHub account.
      */
-    private function createPullRequest()
+    public function createPullRequest()
     {
         if ($this->client == null) {
             $this->authenticateClient();
