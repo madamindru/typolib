@@ -42,4 +42,27 @@ class Strings
 
         return $sentences_array;
     }
+
+    /**
+     * Replace a character in a string given its position.
+     *
+     * @param  String $string   The input string.
+     * @param  String $char     The replacement string.
+     * @param  int    $position The position where the replacing will begin
+     *                          (1 if empty).
+     * @param  int    $length   The length of the portion of string which is to be
+     *                          replaced.
+     * @param  String $encoding The character encoding ('UTF-8' if empty).
+     * @return string $string   The text corrected.
+     */
+    public static function replaceString($string, $char, $position, $length = 1, $encoding = 'UTF-8')
+    {
+        mb_internal_encoding($encoding);
+
+        $startString = mb_substr($string, 0, $position);
+        $endString = mb_substr($string, $position + $length, mb_strlen($string));
+        $string = $startString . $char . $endString;
+
+        return $string;
+    }
 }

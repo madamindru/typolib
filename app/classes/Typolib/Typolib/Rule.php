@@ -2,6 +2,7 @@
 namespace Typolib;
 
 use Exception;
+use IntlBreakIterator;
 
 /**
  * Rule class
@@ -29,6 +30,17 @@ class Rule
     private static $end_variable_tag = '->';
     private static $plural_separator_array = [];
     private static $all_ids = [];
+    private static $quotation_marks = [
+                                            ['«','»'],
+                                            ['“','”'],
+                                            ['"', '"'],
+                                            ['‘','’'],
+                                            ['»','«'],
+                                            ['„','“'],
+                                            ['„','”'],
+                                            ['”','”'],
+
+                                      ];
 
     /**
      * Constructor that initializes all the arguments then call the method to
@@ -189,6 +201,65 @@ class Rule
 
                 return $array;
             }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check in a string if there is quotation marks.
+     *
+     * @param  String $string The string to check.
+     * @return array  $position The list of all quotation marks present in the
+     *                       string (with their position in the string).
+     */
+    private static function findQuotationMarks($string)
+    {
+        $position = null;
+        $i = 0;
+        $codePointIterator = IntlBreakIterator::createCodePointInstance();
+        $codePointIterator->setText($string);
+        $partsIterator = $codePointIterator->getPartsIterator();
+
+        foreach ($partsIterator as $part) {
+            foreach (array_values(self::$quotation_marks) as $key => $value) {
+                if (in_array($part, $value)) {
+                    $position[$i] = $part;
+                }
+            }
+            $i++;
+        }
+
+        return $position != null ? $position : false;
+    }
+
+    /**
+     * Check a "quotation mark" rule.
+     *
+     * @param  string $user_string  The string entered by the user.
+     * @param  string $wantedQuotes The quotation mark wanted by the user.
+     * @return string $user_string  The text corrected.
+     */
+    public static function checkQuotationMarkRule($user_string, $wantedQuotes)
+    {
+        $arrayQuotationMarks = self::findQuotationMarks($user_string);
+
+        if ($arrayQuotationMarks != false) {
+            $pieces = explode(';', $wantedQuotes);
+            $before = $pieces[0];
+            $after = $pieces[1];
+
+            $count = 0;
+            foreach ($arrayQuotationMarks as $position => $quote) {
+                if ($count % 2 == 0) {
+                    $user_string = Strings::replaceString($user_string, $before, $position);
+                } else {
+                    $user_string = Strings::replaceString($user_string, $after, $position);
+                }
+                $count++;
+            }
+
+            return $user_string;
         }
 
         return false;
