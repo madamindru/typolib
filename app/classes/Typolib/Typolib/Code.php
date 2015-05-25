@@ -14,6 +14,7 @@ use Exception;
 class Code
 {
     private $name;
+    private $fake_name;
     private $locale;
     private $path;
     private $use_common_code;
@@ -35,14 +36,14 @@ class Code
         if (Locale::isSupportedLocale($locale)) {
             $this->name = \Transvision\Utils::secureText($name);
             $this->locale = $locale;
-            $false_name = Utils::sanitizeFileName($this->name);
-            if ($false_name != 'common') {
-                $this->path = DATA_ROOT . RULES_REPO . "/$this->locale/$false_name";
+            $this->fake_name = Utils::sanitizeFileName($this->name);
+            if ($this->fake_name != 'common') {
+                $this->path = DATA_ROOT . RULES_STAGING . "/$this->locale/$this->fake_name";
                 $this->use_common_code = $use_common_code;
 
                 if ($this->createCode()) {
                     $this->name = 'common';
-                    if (! is_dir(DATA_ROOT . RULES_REPO . "/$this->locale/$this->name")) {
+                    if (! is_dir(DATA_ROOT . RULES_STAGING . "/$this->locale/$this->name")) {
                         $this->createCode();
                     }
                     $success = true;
@@ -69,18 +70,17 @@ class Code
                 $code['common'] = $this->use_common_code;
                 $path = $this->path;
             } else {
-                $path = DATA_ROOT . RULES_REPO . "/$this->locale/common";
+                $path = DATA_ROOT . RULES_STAGING . "/$this->locale/common";
             }
 
-            // Maybe it's just a new file, but maybe the repo has not been cloned.
-            // We need to make sure the repo is cloned before creating this directory.
-            if (! is_dir(DATA_ROOT . RULES_REPO)) {
-                new RepoManager();
-            }
+            $repo_mgr = new RepoManager();
+
             mkdir($path, 0777, true);
 
             file_put_contents($path . '/rules.php', serialize($code));
             file_put_contents($path . '/exceptions.php', '');
+
+            //$repo_mgr->commitAndPush('Adding "' . $this->fake_name . '" code.');
 
             return true;
         }
@@ -98,20 +98,41 @@ class Code
      */
     public static function deleteCode($name, $locale)
     {
-        $folder = DATA_ROOT . RULES_REPO . "/$locale/$name";
+        $folder = DATA_ROOT . RULES_STAGING . "/$locale/$name";
 
-        return Utils::deleteFolder($folder);
+        if (Utils::deleteFolder($folder)) {
+            $repo_mgr = new RepoManager();
+            //$repo_mgr->commitAndPush('Deleting "' . $name . '" code.');
+
+            return true;
+        }
+
+        return false;
     }
 
-    public static function editCodeName($old_name, $new_name, $locale, $use_common_code)
+    /**
+     * Allows editing a code name and tell if it should be using the common code.
+     *
+     * @param String  $old_name        The current name of the code to edit.
+     * @param String  $new_name        The new code name
+     * @param String  $locale          The locale of the code to edit.
+     * @param boolean $use_common_code true if the code should be using the
+     *                                 common code of this locale. False if it
+     *                                 should not be using any common code.
+     */
+    public static function editCode($old_name, $new_name, $locale, $use_common_code)
     {
-        $folder = DATA_ROOT . RULES_REPO . "/$locale/$old_name";
-        if ($old_name != 'common' && self::existCode($old_name, $locale)) {
-            $content = Rule::getArrayRules($old_name, $locale);
+        $folder = DATA_ROOT . RULES_STAGING . "/$locale/$old_name";
+        if ($old_name != 'common' && self::existCode($old_name, $locale, RULES_STAGING)) {
+            $content = Rule::getArrayRules($old_name, $locale, RULES_STAGING);
             $content['name'] = \Transvision\Utils::secureText($new_name);
             $content['common'] = $use_common_code;
 
+            $repo_mgr = new RepoManager();
+
             file_put_contents($folder . '/rules.php', serialize($content));
+
+            //$repo_mgr->commitAndPush('Editing "' . $new_name . '" code.');
         }
     }
 
@@ -120,11 +141,12 @@ class Code
      *
      * @param  String  $name   The name of the code we search.
      * @param  String  $locale The locale of the code we search.
+     * @param  String  $repo   Repository we want to check (staging or production)
      * @return boolean True if the code exists.
      */
-    public static function existCode($name, $locale)
+    public static function existCode($name, $locale, $repo)
     {
-        $folder = DATA_ROOT . RULES_REPO . "/$locale/$name";
+        $folder = DATA_ROOT . $repo . "/$locale/$name";
 
         return file_exists($folder);
     }
@@ -133,12 +155,13 @@ class Code
      * List all the available codes for a given locale.
      *
      * @param  String $locale The locale of the codes we search.
+     * @param  String $repo   Repository we want to check (staging or production)
      * @return array  The list of all the codes for the locale.
      */
-    public static function getCodeList($locale)
+    public static function getCodeList($locale, $repo)
     {
         if (Locale::isSupportedLocale($locale)) {
-            $dir = DATA_ROOT . RULES_REPO . "/$locale";
+            $dir = DATA_ROOT . $repo . "/$locale";
 
             return self::scanDirectory($dir);
         } else {

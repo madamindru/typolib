@@ -20,6 +20,6 @@
             <input type="checkbox" name="common" id="common"/><label for="common">Use the common code</label>
         </fieldset>
         <br/>
-        <input type="submit" value="Edit" alt="Edit" />
+        <input type="submit" value="Create" alt="Create" />
     </fieldset>
 </form>
