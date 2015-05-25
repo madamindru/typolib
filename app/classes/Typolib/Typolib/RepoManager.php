@@ -29,7 +29,7 @@ class RepoManager
     private $user_config;
     private $our_remote = 'origin';
     private $client = null;
-    private $client_remote = 'origin';
+    private $client_remote = 'github';
     private $remote_url;
     private $branch;
     private $branch_prefix = 'typolib-';
@@ -57,7 +57,7 @@ class RepoManager
                      . '@github.com/' . urlencode(TYPOLIB_GITHUB_ACCOUNT)
                      . '/' . $this->repo . '.git';
         $path        = DATA_ROOT . $this->repo . '/';
-        $update_file = DATA_ROOT . 'lastupdate.txt';
+        $update_file = CACHE_PATH . 'lastupdate.txt';
 
         $this->branch      = isset($args['branch'])      ? $args['branch']      : 'master';
         $this->repo_url    = isset($args['repo_url'])    ? $args['repo_url']    : $github_url;
@@ -148,7 +148,7 @@ class RepoManager
                                     )->execute();
 
                 $this->git->fetch()->execute($this->client_remote);
-                $this->git->checkout()->execute('master');
+                $this->git->checkout('master');
 
                 if (! file_put_contents($this->config_file,
                                         $this->user_config, FILE_APPEND)) {
@@ -173,11 +173,17 @@ class RepoManager
      */
     public function updateMaster()
     {
+
+        // FIXME: actually update master instead of deleting + recloning everytime.
+        Utils::deleteFolder(DATA_ROOT . RULES_STAGING);
+        $this->cloneAndConfig();
+
+        /*
         $this->git->fetch()->execute($this->client_remote, 'master');
-        $this->git->checkout()->execute($this->client_remote . '/master');
-        dump("plop");
+        $this->git->checkout('master');*/
+
         $sha = $this->getMasterSha();
-        if (! file_put_contents($sha, $this->update_file)) {
+        if (! file_put_contents($this->update_file, $sha)) {
             $this->logger->error('Can\'t write ' . $this->update_file . ' file');
 
             return false;
@@ -205,7 +211,7 @@ class RepoManager
                     ['sha' => 'master']
                 )[0]['sha'];
 
-        return $sha || false;
+        return $sha;
     }
 
     /**
@@ -217,14 +223,14 @@ class RepoManager
      */
     public function checkForUpdates()
     {
-        //$local_sha = file_get_contents($this->update_file);
+        $local_sha = file_get_contents($this->update_file);
         $remote_sha = $this->getMasterSha();
 
-        //if ($local_sha != $remote_sha) {
+        if ($local_sha != $remote_sha) {
             $this->updateMaster();
 
-        return true;
-        //}
+            return true;
+        }
 
         return false;
     }
@@ -314,6 +320,7 @@ class RepoManager
     {
         $this->commit_msg = $commit_msg;
         try {
+
             // Add files to git index, commit and push to client remote
             //$this->git->checkout()->execute($this->client_remote . '/master');
             $this->git->add()->all()->execute();

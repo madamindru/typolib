@@ -94,7 +94,11 @@ class Rule
             $code['rules'][$this->id]['comment'] = $this->comment;
         }
 
+        $repo_mgr = new RepoManager();
+
         file_put_contents($file, serialize($code));
+
+        $repo_mgr->commitAndPush("Adding new rule in /$locale_code/$name_code");
     }
 
     /**
@@ -120,10 +124,19 @@ class Rule
                     unset($code['rules'][$id]);
 
                     //delete all the exceptions for the rule.
-                    $rule_exceptions = self::getArrayRuleExceptions($name_code, $locale_code, $id, RULES_STAGING);
+                    $rule_exceptions = self::getArrayRuleExceptions($name_code,
+                                                                    $locale_code,
+                                                                    $id,
+                                                                    RULES_STAGING
+                                                                );
                     if ($rule_exceptions != false) {
                         foreach ($rule_exceptions as $id_exception => $content) {
-                            RuleException::manageException($name_code, $locale_code, $id_exception, 'delete');
+                            RuleException::manageException(
+                                                            $name_code,
+                                                            $locale_code,
+                                                            $id_exception,
+                                                            'delete'
+                                                        );
                         }
                     }
                     break;
@@ -143,7 +156,12 @@ class Rule
                     $code['rules'][$id]['comment'] = $value;
                     break;
             }
+
+            $repo_mgr = new RepoManager();
+
             file_put_contents($file, serialize($code));
+
+            $repo_mgr->commitAndPush("Editing rule in /$locale_code/$name_code");
 
             return true;
         }
@@ -191,7 +209,11 @@ class Rule
     {
         $code = Rule::getArrayRules($name_code, $locale_code, $repo);
         if ($code != null && Rule::existRule($code, $id)) {
-            $rule_exceptions = RuleException::getArrayExceptions($name_code, $locale_code, $repo);
+            $rule_exceptions = RuleException::getArrayExceptions(
+                                                                $name_code,
+                                                                $locale_code,
+                                                                $repo
+                                                            );
 
             if ($rule_exceptions != false) {
                 foreach ($rule_exceptions['exceptions'] as $id_exception => $exception) {
@@ -218,11 +240,11 @@ class Rule
     {
         $position = null;
         $i = 0;
-        $codePointIterator = IntlBreakIterator::createCodePointInstance();
-        $codePointIterator->setText($string);
-        $partsIterator = $codePointIterator->getPartsIterator();
+        $code_point_iterator = IntlBreakIterator::createCodePointInstance();
+        $code_point_iterator->setText($string);
+        $parts_iterator = $code_point_iterator->getPartsIterator();
 
-        foreach ($partsIterator as $part) {
+        foreach ($parts_iterator as $part) {
             foreach (array_values(self::$quotation_marks) as $key => $value) {
                 if (in_array($part, $value)) {
                     $position[$i] = $part;
@@ -237,25 +259,33 @@ class Rule
     /**
      * Check a "quotation mark" rule.
      *
-     * @param  string $user_string  The string entered by the user.
-     * @param  string $wantedQuotes The quotation mark wanted by the user.
+     * @param  string $user_string   The string entered by the user.
+     * @param  string $wanted_quotes The quotation mark wanted by the user.
      * @return string $user_string  The text corrected.
      */
-    public static function checkQuotationMarkRule($user_string, $wantedQuotes)
+    public static function checkQuotationMarkRule($user_string, $wanted_quotes)
     {
-        $arrayQuotationMarks = self::findQuotationMarks($user_string);
+        $array_quotation_marks = self::findQuotationMarks($user_string);
 
-        if ($arrayQuotationMarks != false) {
-            $pieces = explode(';', $wantedQuotes);
+        if ($array_quotation_marks != false) {
+            $pieces = explode(';', $wanted_quotes);
             $before = $pieces[0];
             $after = $pieces[1];
 
             $count = 0;
-            foreach ($arrayQuotationMarks as $position => $quote) {
+            foreach ($array_quotation_marks as $position => $quote) {
                 if ($count % 2 == 0) {
-                    $user_string = Strings::replaceString($user_string, $before, $position);
+                    $user_string = Strings::replaceString(
+                                                            $user_string,
+                                                            $before,
+                                                            $position
+                                                        );
                 } else {
-                    $user_string = Strings::replaceString($user_string, $after, $position);
+                    $user_string = Strings::replaceString(
+                                                            $user_string,
+                                                            $after,
+                                                            $position
+                                                        );
                 }
                 $count++;
             }
@@ -269,15 +299,17 @@ class Rule
     /**
      * Add a "if x then y" rule to the global array
      *
-     * @param string $userString the string entered by the user
+     * @param string $user_string the string entered by the user
      */
-    public function addRuleToIfThenArrayRule($userString)
+    public function addRuleToIfThenArrayRule($user_string)
     {
-        $pieces = explode(' ', $userString);
-        $inputCharacter = $pieces[1];
-        $newCharacter = $pieces[3];
+        $pieces = explode(' ', $user_string);
+        $input_character = $pieces[1];
+        $new_character = $pieces[3];
 
-        self::$ifThenRuleArray[$inputCharacter] = $newCharacter; // if a value with the same key is added, the previous value will be replaced by the new one
+        // if a value with the same key is added, the previous value will be
+        // replaced by the new one
+        self::$ifThenRuleArray[$input_character] = $new_character;
     }
 
     /**
@@ -294,31 +326,31 @@ class Rule
      * Check a "if x then y" rule (just for ellipsis character)
      * TODO : generic method for any character of the ifThen rule array
      *
-     * @param string $userString the string entered by the user
+     * @param string $user_string the string entered by the user
      */
-    public static function checkIfThenRule($userString)
+    public static function checkIfThenRule($user_string)
     {
         $res = []; // var to be returned
-        $searchs = self::$ifThenRuleArray;
+        $searches = self::$ifThenRuleArray;
         $positions = []; // array containing the positions of the errors detected in the source string
 
-        foreach ($searchs as $search => $replace) {
+        foreach ($searches as $search => $replace) {
             $last_position = 0;
 
             // save all the positions of the errors
-            while (($last_position = strpos($userString, $search, $last_position)) !== false) {
+            while (($last_position = strpos($user_string, $search, $last_position)) !== false) {
                 $$next_position = $last_position + strlen($search);
                 $positions[$last_position] = $$next_position;
                 $last_position = $$next_position;
             }
 
             // replace all the errors by the characters entered by the user
-            if (strpos($userString, $search) !== false) {
-                $userString = str_replace($search, $replace, $userString);
+            if (strpos($user_string, $search) !== false) {
+                $user_string = str_replace($search, $replace, $user_string);
             }
         }
 
-        array_push($res, $userString);
+        array_push($res, $user_string);
         array_push($res, $positions);
 
         return $res;
@@ -327,15 +359,18 @@ class Rule
     /**
      * Add a variable to the global array of variables to ignore
      *
-     * @param string $userString the string entered by the user
+     * @param string $user_string the string entered by the user
      */
-    public static function addRuleToVariableToIgnoreArray($userString)
+    public static function addRuleToVariableToIgnoreArray($user_string)
     {
-        $var_array = preg_split('/[\s]+/', $userString);
+        $var_array = preg_split('/[\s]+/', $user_string);
 
-        self::$variable_to_ignore_array = array_merge(self::$variable_to_ignore_array, $var_array);
+        self::$variable_to_ignore_array = array_merge(
+                                            self::$variable_to_ignore_array,
+                                            $var_array
+                                        );
 
-        //self::$variable_to_ignore_array[$userString] = self::$start_variable_tag . $userString . self::$end_variable_tag;
+        //self::$variable_to_ignore_array[$user_string] = self::$start_variable_tag . $user_string . self::$end_variable_tag;
     }
 
     /**
@@ -351,11 +386,11 @@ class Rule
     /**
      * Add a separator to the global array of plural separators
      *
-     * @param string $userString the string entered by the user
+     * @param string $user_string the string entered by the user
      */
-    public static function addRuleToPluralSeparatorArray($userString)
+    public static function addRuleToPluralSeparatorArray($user_string)
     {
-        self::$plural_separator_array[] = $userString;
+        self::$plural_separator_array[] = $user_string;
     }
 
     /**
@@ -368,49 +403,57 @@ class Rule
         }
     }
 
-    public static function checkSeparatorRule($userString)
+    public static function checkSeparatorRule($user_string)
     {
         foreach (self::$plural_separator_array as $key => $separator) {
-            $pos = strpos($userString, $separator);
+            $pos = strpos($user_string, $separator);
 
             if ($pos !== false) {
                 //$separator = ';';
-                $splitStrings = explode($separator, $userString);
-                $levenshteinResults = [];
-                $acceptanceLevel = 90;
+                $split_strings = explode($separator, $user_string);
+                $levenshtein_results = [];
+                $acceptance_level = 90;
 
-                $arr_length = count($splitStrings);
+                $arr_length = count($split_strings);
                 for ($i = 0;$i < $arr_length;$i++) {
                     if ($i + 1 < $arr_length) {
-                        $levenshteinResults[] = Strings::levenshteinQuality($splitStrings[$i], $splitStrings[$i + 1]);
+                        $levenshtein_results[] = Strings::levenshteinQuality(
+                                                            $split_strings[$i],
+                                                            $split_strings[$i + 1]
+                                                        );
                     }
                 }
 
-                $levenshteinResultsAverage = 0;
+                $levenshtein_results_average = 0;
 
-                foreach ($levenshteinResults as $key => $value) {
-                    $levenshteinResultsAverage += $value;
+                foreach ($levenshtein_results as $key => $value) {
+                    $levenshtein_results_average += $value;
                 }
 
-                $levenshteinResultsAverage = $levenshteinResultsAverage / count($levenshteinResults);
+                $levenshtein_results_average =
+                        $levenshtein_results_average / count($levenshtein_results);
 
-                if ($levenshteinResultsAverage > $acceptanceLevel) {
-                    $userString = str_replace($separator, $start_variable_tag . $separator . $end_variable_tag, $userString);
+                if ($levenshtein_results_average > $acceptance_level) {
+                    $user_string = str_replace(
+                                $separator,
+                                $start_variable_tag . $separator . $end_variable_tag,
+                                $user_string
+                            );
                 }
             }
         }
 
-        return $userString;
+        return $user_string;
     }
 
     /**
      * Ignore all the variables of the variable_to_ignore_array in the user string
      *
-     * @param string $userString the string entered by the user
+     * @param string $user_string the string entered by the user
      */
-    public static function ignoreVariables($userString)
+    public static function ignoreVariables($user_string)
     {
-        strtr($userString, $variable_to_ignore_array);
+        strtr($user_string, $variable_to_ignore_array);
     }
 
     /**

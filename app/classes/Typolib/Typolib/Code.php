@@ -80,7 +80,7 @@ class Code
             file_put_contents($path . '/rules.php', serialize($code));
             file_put_contents($path . '/exceptions.php', '');
 
-            //$repo_mgr->commitAndPush('Adding "' . $this->fake_name . '" code.');
+            $repo_mgr->commitAndPush('Adding "' . $this->fake_name . '" code.');
 
             return true;
         }
@@ -102,7 +102,7 @@ class Code
 
         if (Utils::deleteFolder($folder)) {
             $repo_mgr = new RepoManager();
-            //$repo_mgr->commitAndPush('Deleting "' . $name . '" code.');
+            $repo_mgr->commitAndPush('Deleting "' . $name . '" code.');
 
             return true;
         }
@@ -132,7 +132,7 @@ class Code
 
             file_put_contents($folder . '/rules.php', serialize($content));
 
-            //$repo_mgr->commitAndPush('Editing "' . $new_name . '" code.');
+            $repo_mgr->commitAndPush('Editing "' . $new_name . '" code.');
         }
     }
 

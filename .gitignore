@@ -1,6 +1,6 @@
 app/config/config.ini
 cache/*.cache
-cache/lastdataupdate.txt
+cache/lastupdate.txt
 data
 composer.lock
 composer.phar
