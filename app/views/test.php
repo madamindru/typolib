@@ -6,8 +6,10 @@ $locales = Locale::getLocaleList();
 dump($locales);
 $repo_mgr = new RepoManager();
 
-$content_array = ["erte", "ter"];
-$new_rule = new Rule('test', 'fr', $content_array, 'if_then');
+$rules = Rule::getArrayRules('test', 'fr', RULES_STAGING);
+foreach ($rules['rules'] as $key => $value) {
+    dump($buildRule[$key] = Rule::buildRuleString($value['type'], $value['content']));
+}
 ?>
 
 <form id="mainform">

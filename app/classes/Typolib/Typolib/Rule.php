@@ -20,7 +20,7 @@ class Rule
     private $type;
     private $comment;
     // FIXME: string?
-    private static $rules_type = ['if_then'     => 'IF %s THEN %s',
+    public static $rules_type = [ 'if_then'     => 'IF %s THEN %s',
                                   'contains'    => 'CONTAINS %s',
                                   'string'      => 'STRING',
                                   'starts_with' => 'STARTS WITH %s',
@@ -516,8 +516,8 @@ class Rule
 
     public static function buildRuleString($type, $rule)
     {
-        if (self::$isSupportedType($type)) {
-            sprintf(self::$rules_type[$type], $rule);
+        if (self::isSupportedType($type)) {
+            return vsprintf(self::$rules_type[$type], $rule);
         }
     }
 }
