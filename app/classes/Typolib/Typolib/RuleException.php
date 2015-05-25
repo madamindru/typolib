@@ -63,7 +63,11 @@ class RuleException
         end($exception['exceptions']);
         $this->id = key($exception['exceptions']);
 
+        $repo_mgr = new RepoManager();
+
         file_put_contents($file, serialize($exception));
+
+        $repo_mgr->commitAndPush("Adding new exception in /$code_locale/$code_name");
     }
 
     /**
@@ -93,7 +97,12 @@ class RuleException
                     break;
 
             }
+
+            $repo_mgr = new RepoManager();
+
             file_put_contents($file, serialize($exception));
+
+            $repo_mgr->commitAndPush("Editing exception in /$code_locale/$code_name");
 
             return true;
         }

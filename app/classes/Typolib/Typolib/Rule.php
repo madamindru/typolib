@@ -94,7 +94,11 @@ class Rule
             $code['rules'][$this->id]['comment'] = $this->comment;
         }
 
+        $repo_mgr = new RepoManager();
+
         file_put_contents($file, serialize($code));
+
+        $repo_mgr->commitAndPush("Adding new rule in /$locale_code/$name_code");
     }
 
     /**
@@ -143,7 +147,12 @@ class Rule
                     $code['rules'][$id]['comment'] = $value;
                     break;
             }
+
+            $repo_mgr = new RepoManager();
+
             file_put_contents($file, serialize($code));
+
+            $repo_mgr->commitAndPush("Editing rule in /$locale_code/$name_code");
 
             return true;
         }
