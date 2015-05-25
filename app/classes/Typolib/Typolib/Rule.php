@@ -3,6 +3,7 @@ namespace Typolib;
 
 use Exception;
 use IntlBreakIterator;
+use Transvision\Strings;
 
 /**
  * Rule class
@@ -293,38 +294,34 @@ class Rule
      * Check a "if x then y" rule (just for ellipsis character)
      * TODO : generic method for any character of the ifThen rule array
      *
-     * @param string      $userString the string entered by the user
-     * @param string      $search     the searched character in $userString to replace
-     * @param string enum $mode       the mode used by the user (list of errors or text corrected)
+     * @param string $userString the string entered by the user
      */
-    public function checkIfThenRuleEllipsis($userString, $mode)
+    public static function checkIfThenRule($userString)
     {
-        $mystring = "Yes ... that's true, but ...";
-        $search = '/\.{3}/'; // equivalent to ...
-        $search2 = '...';
-        $replace = '&#8230;'; // ellipsis character
-        $errors_beginning = [];
-        $is_matched = false;
-        $i = 0;
+        $res = []; // var to be returned
+        $searchs = self::$ifThenRuleArray;
+        $positions = []; // array containing the positions of the errors detected in the source string
 
-        do {
-            $is_matched = false;
-            if (strpos($mystring, $search2) !== false) {
-                $errors_beginning[$i] = strpos($mystring, $search2);
-                $i = $i + 1;
-                $mystring = preg_replace($search, $replace, $mystring, 1);
+        foreach ($searchs as $search => $replace) {
+            $last_position = 0;
 
-                $is_matched = true;
+            // save all the positions of the errors
+            while (($last_position = strpos($userString, $search, $last_position)) !== false) {
+                $$next_position = $last_position + strlen($search);
+                $positions[$last_position] = $$next_position;
+                $last_position = $$next_position;
             }
-        } while ($is_matched);
 
-        if ($mode == "ERROR_LIST") {
-            return $errors_beginning;
+            // replace all the errors by the characters entered by the user
+            if (strpos($userString, $search) !== false) {
+                $userString = str_replace($search, $replace, $userString);
+            }
         }
 
-        if ($mode == "CORRECTED_TEXT") {
-            return $mystring;
-        }
+        array_push($res, $userString);
+        array_push($res, $positions);
+
+        return $res;
     }
 
     /**
@@ -332,9 +329,13 @@ class Rule
      *
      * @param string $userString the string entered by the user
      */
-    public function addRuleToVariableToIgnoreArray($userString)
+    public static function addRuleToVariableToIgnoreArray($userString)
     {
-        self::$variable_to_ignore_array[$userString] = self::$start_variable_tag . $userString . self::$end_variable_tag;
+        $var_array = preg_split('/[\s]+/', $userString);
+
+        self::$variable_to_ignore_array = array_merge(self::$variable_to_ignore_array, $var_array);
+
+        //self::$variable_to_ignore_array[$userString] = self::$start_variable_tag . $userString . self::$end_variable_tag;
     }
 
     /**
@@ -352,7 +353,7 @@ class Rule
      *
      * @param string $userString the string entered by the user
      */
-    public function addRuleToPluralSeparatorArray($userString)
+    public static function addRuleToPluralSeparatorArray($userString)
     {
         self::$plural_separator_array[] = $userString;
     }
@@ -365,6 +366,41 @@ class Rule
         foreach (self::$plural_separator_array as $key => $value) {
             echo "Plural separator: $value<br />\n";
         }
+    }
+
+    public static function checkSeparatorRule($userString)
+    {
+        foreach (self::$plural_separator_array as $key => $separator) {
+            $pos = strpos($userString, $separator);
+
+            if ($pos !== false) {
+                //$separator = ';';
+                $splitStrings = explode($separator, $userString);
+                $levenshteinResults = [];
+                $acceptanceLevel = 90;
+
+                $arr_length = count($splitStrings);
+                for ($i = 0;$i < $arr_length;$i++) {
+                    if ($i + 1 < $arr_length) {
+                        $levenshteinResults[] = Strings::levenshteinQuality($splitStrings[$i], $splitStrings[$i + 1]);
+                    }
+                }
+
+                $levenshteinResultsAverage = 0;
+
+                foreach ($levenshteinResults as $key => $value) {
+                    $levenshteinResultsAverage += $value;
+                }
+
+                $levenshteinResultsAverage = $levenshteinResultsAverage / count($levenshteinResults);
+
+                if ($levenshteinResultsAverage > $acceptanceLevel) {
+                    $userString = str_replace($separator, $start_variable_tag . $separator . $end_variable_tag, $userString);
+                }
+            }
+        }
+
+        return $userString;
     }
 
     /**
