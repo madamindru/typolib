@@ -3,6 +3,6 @@ namespace Typolib;
 
 use Transvision\Utils;
 
-$codes = Code::getCodeList($locale);
-reset($codes);
-echo Utils::getHtmlSelectOptions(Code::getCodeList($locale), key($codes), true);
+$codes = $code_key = Code::getCodeList($locale, RULES_STAGING);
+reset($code_key);
+echo Utils::getHtmlSelectOptions($codes, key($code_key), true);

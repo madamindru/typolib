@@ -57,7 +57,7 @@ class Rule
     {
         $success = false;
 
-        if (Code::existCode($name_code, $locale_code) && self::isSupportedType($type)) {
+        if (Code::existCode($name_code, $locale_code, RULES_STAGING) && self::isSupportedType($type)) {
             $this->content = $content;
             $this->type = $type;
             $this->comment = $comment;
@@ -78,8 +78,8 @@ class Rule
      */
     private function createRule($name_code, $locale_code)
     {
-        $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
-        $code = Rule::getArrayRules($name_code, $locale_code);
+        $file = DATA_ROOT . RULES_STAGING . "/$locale_code/$name_code/rules.php";
+        $code = Rule::getArrayRules($name_code, $locale_code, RULES_STAGING);
         $code['rules'][] = [
                                 'content' => $this->content,
                                 'type'    => $this->type,
@@ -110,16 +110,16 @@ class Rule
      */
     public static function manageRule($name_code, $locale_code, $id, $action, $value = '')
     {
-        $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
+        $file = DATA_ROOT . RULES_STAGING . "/$locale_code/$name_code/rules.php";
 
-        $code = Rule::getArrayRules($name_code, $locale_code);
+        $code = Rule::getArrayRules($name_code, $locale_code, RULES_STAGING);
         if ($code != null && Rule::existRule($code, $id)) {
             switch ($action) {
                 case 'delete':
                     unset($code['rules'][$id]);
 
                     //delete all the exceptions for the rule.
-                    $rule_exceptions = self::getArrayRuleExceptions($name_code, $locale_code, $id);
+                    $rule_exceptions = self::getArrayRuleExceptions($name_code, $locale_code, $id, RULES_STAGING);
                     if ($rule_exceptions != false) {
                         foreach ($rule_exceptions as $id_exception => $content) {
                             RuleException::manageException($name_code, $locale_code, $id_exception, 'delete');
@@ -167,11 +167,12 @@ class Rule
      *
      * @param String $name_code   The code name from which the rules depend.
      * @param String $locale_code The locale code from which the rules depend.
+     * @param String $repo        Repository we want to check (staging or production)
      */
-    public static function getArrayRules($name_code, $locale_code)
+    public static function getArrayRules($name_code, $locale_code, $repo)
     {
-        if (Code::existCode($name_code, $locale_code)) {
-            $file = DATA_ROOT . RULES_REPO . "/$locale_code/$name_code/rules.php";
+        if (Code::existCode($name_code, $locale_code, $repo)) {
+            $file = DATA_ROOT . $repo . "/$locale_code/$name_code/rules.php";
 
             return unserialize(file_get_contents($file));
         }
@@ -183,12 +184,13 @@ class Rule
      * @param String $name_code   The code name from which the exceptions depend.
      * @param String $locale_code The locale code from which the exceptions depend.
      * @param String $id          The rule id from which the exceptions depend.
+     * @param String $repo        Repository we want to check (staging or production)
      */
-    public static function getArrayRuleExceptions($name_code, $locale_code, $id)
+    public static function getArrayRuleExceptions($name_code, $locale_code, $id, $repo)
     {
-        $code = Rule::getArrayRules($name_code, $locale_code);
+        $code = Rule::getArrayRules($name_code, $locale_code, $repo);
         if ($code != null && Rule::existRule($code, $id)) {
-            $rule_exceptions = RuleException::getArrayExceptions($name_code, $locale_code);
+            $rule_exceptions = RuleException::getArrayExceptions($name_code, $locale_code, $repo);
 
             if ($rule_exceptions != false) {
                 foreach ($rule_exceptions['exceptions'] as $id_exception => $exception) {

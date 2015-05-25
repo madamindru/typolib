@@ -31,8 +31,8 @@ class RuleException
     {
         $success = false;
 
-        $code = Rule::getArrayRules($code_name, $code_locale);
-        if ($code != null && Rule::existRule($code, $rule_id)) {
+        $code = Rule::getArrayRules($code_name, $code_locale, RULES_STAGING);
+        if ($code != null && Rule::existRule($code, $rule_id, RULES_STAGING)) {
             $this->content = $content;
             $this->rule_id = $rule_id;
             $this->createException($code_name, $code_locale);
@@ -54,8 +54,8 @@ class RuleException
      */
     private function createException($code_name, $code_locale)
     {
-        $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
-        $exception = self::getArrayExceptions($code_name, $code_locale);
+        $file = DATA_ROOT . RULES_STAGING . "/$code_locale/$code_name/exceptions.php";
+        $exception = self::getArrayExceptions($code_name, $code_locale, RULES_STAGING);
         $exception['exceptions'][] = ['rule_id' => $this->rule_id,
                                       'content' => $this->content, ];
 
@@ -79,10 +79,10 @@ class RuleException
      */
     public static function manageException($code_name, $code_locale, $id, $action, $value = '')
     {
-        $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
+        $file = DATA_ROOT . RULES_STAGING . "/$code_locale/$code_name/exceptions.php";
 
-        $exception = self::getArrayExceptions($code_name, $code_locale);
-        if ($exception != null && self::existException($exception, $id)) {
+        $exception = self::getArrayExceptions($code_name, $code_locale, RULES_STAGING);
+        if ($exception != null && self::existException($exception, $id, RULES_STAGING)) {
             switch ($action) {
                 case 'delete':
                     unset($exception['exceptions'][$id]);
@@ -118,11 +118,12 @@ class RuleException
      *
      * @param String $code_name   The code name from which the exceptions depend.
      * @param String $code_locale The locale code from which the exceptions depend.
+     * @param String $repo        Repository we want to check (staging or production)
      */
-    public static function getArrayExceptions($code_name, $code_locale)
+    public static function getArrayExceptions($code_name, $code_locale, $repo)
     {
-        if (Code::existCode($code_name, $code_locale)) {
-            $file = DATA_ROOT . RULES_REPO . "/$code_locale/$code_name/exceptions.php";
+        if (Code::existCode($code_name, $code_locale, $repo)) {
+            $file = DATA_ROOT . $repo . "/$code_locale/$code_name/exceptions.php";
 
             return unserialize(file_get_contents($file));
         }
