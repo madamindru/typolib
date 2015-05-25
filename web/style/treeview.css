@@ -9,6 +9,15 @@
     margin-bottom: 5px;
 }
 
+.treeview span.comment {
+    font-size: 1.0em;
+    color: rgba(255, 0, 0, 1);
+    font-style: italic; 
+    height: 1em;
+    line-height: 1em;
+    bottom: 2.0em;
+}
+
 .treeview ul,
 .treeview li
 {
