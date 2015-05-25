@@ -25,8 +25,11 @@
                                 <?=$rule['content']?>
                             </label>
                             <input type="button" class="button button-negative delete-rule" value="×">
-                            <span class="comment"> <?=$rule['comment']?>
-                            </span>
+                            <?php if (isset($rule['comment'])) : ?>
+                                <span class="comment">
+                                    <?=$rule['comment']?>
+                                </span>
+                            <?php endif; ?>
                             <ul class="exceptions">
                                 <?php
                                     $exception_number = 0;
