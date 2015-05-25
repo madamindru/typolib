@@ -39,8 +39,7 @@ class Rule
                                             ['»','«'],
                                             ['„','“'],
                                             ['„','”'],
-                                            ['”','”'],
-
+                                            ['”','”']
                                       ];
 
     /**
@@ -259,19 +258,16 @@ class Rule
     /**
      * Check a "quotation mark" rule.
      *
-     * @param  string $user_string   The string entered by the user.
-     * @param  string $wanted_quotes The quotation mark wanted by the user.
+     * @param  string $user_string  The string entered by the user.
+     * @param  string $before The opening quotation mark wanted by the user.
+     * @param  string $after The ending quotation mark wanted by the user.
      * @return string $user_string  The text corrected.
      */
-    public static function checkQuotationMarkRule($user_string, $wanted_quotes)
+    public static function checkQuotationMarkRule($user_string, $before, $after)
     {
         $array_quotation_marks = self::findQuotationMarks($user_string);
 
-        if ($array_quotation_marks != false) {
-            $pieces = explode(';', $wanted_quotes);
-            $before = $pieces[0];
-            $after = $pieces[1];
-
+        if ($arrayQuotationMarks != false) {
             $count = 0;
             foreach ($array_quotation_marks as $position => $quote) {
                 if ($count % 2 == 0) {
