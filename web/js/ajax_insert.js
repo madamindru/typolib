@@ -150,12 +150,20 @@ $('#submitRule').click(function(event) {
     rule = $('#rule').val();
     comment = $('#comment').val();
     placeholder = $('#addrule_type :selected').text();
+    var inputs = new Array();
+    $('input[type=text]').each(function(){
+        var input = $(this);
+        if(input.attr('name').toLowerCase().indexOf("input") >= 0) {
+            inputs.push(input.val());
+        }
+    });
+    var array_content = JSON.stringify(inputs);
     $('#rule').val(placeholder);
     $('#comment').val('');
     $.ajax({
         url: "api/",
         type: "GET",
-        data: "action=adding_rule&locale=" + locale + "&code=" + code + "&type=" + rule_type + "&content=" + rule + "&comment=" + comment,
+        data: "action=adding_rule&locale=" + locale + "&code=" + code + "&type=" + rule_type + "&content=" + rule + "&comment=" + comment + "&array=" + array_content,
         dataType: "html",
         success: function(response) {
             $("#results").html(response);

@@ -20,11 +20,11 @@ class Rule
     private $type;
     private $comment;
     // FIXME: string?
-    private static $rules_type = ['if_then'     => 'IF […] THEN […]',
-                                  'contains'    => 'CONTAINS […]',
+    private static $rules_type = ['if_then'     => 'IF %s THEN %s',
+                                  'contains'    => 'CONTAINS %s',
                                   'string'      => 'STRING',
-                                  'starts_with' => 'STARTS WITH […]',
-                                  'ends_with'   => 'ENDS WITH […]', ];
+                                  'starts_with' => 'STARTS WITH %s',
+                                  'ends_with'   => 'ENDS WITH %s', ];
     private static $ifThenRuleArray = [];
     private static $variable_to_ignore_array = [];
     private static $start_variable_tag = '<-';
@@ -39,7 +39,7 @@ class Rule
                                             ['»','«'],
                                             ['„','“'],
                                             ['„','”'],
-                                            ['”','”']
+                                            ['”','”'],
                                       ];
 
     /**
@@ -48,7 +48,7 @@ class Rule
      *
      * @param  String  $name_code   The code name from which the rule depends.
      * @param  String  $locale_code The locale code from which the rule depends.
-     * @param  String  $content     The content of the new rule.
+     * @param  array   $content     The content of the new rule.
      * @param  String  $type        The type of the new rule.
      * @param  String  $comment     The comment of the new rule.
      * @return boolean True if the rule has been created.
@@ -58,11 +58,13 @@ class Rule
         $success = false;
 
         if (Code::existCode($name_code, $locale_code, RULES_STAGING) && self::isSupportedType($type)) {
-            $this->content = $content;
-            $this->type = $type;
-            $this->comment = $comment;
-            $this->createRule($name_code, $locale_code);
-            $success = true;
+            if (array_filter($content)) {
+                $this->content = $content;
+                $this->type = $type;
+                $this->comment = $comment;
+                $this->createRule($name_code, $locale_code);
+                $success = true;
+            }
         }
 
         if (! $success) {
@@ -510,5 +512,12 @@ class Rule
     public static function getRulesTypeList()
     {
         return self::$rules_type;
+    }
+
+    public static function buildRuleString($type, $rule)
+    {
+        if (self::$isSupportedType($type)) {
+            sprintf(self::$rules_type[$type], $rule);
+        }
     }
 }
