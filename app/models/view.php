@@ -10,8 +10,11 @@ $locale_selector = Utils::getHtmlSelectOptions(
 
 $rules = Rule::getRulesTypeList();
 reset($rules);
+foreach (Rule::getRulesTypeList() as $key => $value) {
+    $ruletypes[$key] = sprintf(str_replace('%s', '%1$s', $value), '[…]');
+}
 $ruletypes_selector = Utils::getHtmlSelectOptions(
-                                Rule::getRulesTypeList(),
+                                $ruletypes,
                                 key($rules),
                                 true
                             );
@@ -21,8 +24,11 @@ reset($code_key);
 $code_key = key($code_key);
 $code_selector = Utils::getHtmlSelectOptions($codes, $code_key, true);
 
-$ruletypes = Rule::getRulesTypeList();
 $first_rule = array_values($rules)[0];
 $rules = Rule::getArrayRules($code_key, $locale, RULES_STAGING);
 
 $rule_exceptions = RuleException::getArrayExceptions($code_key, $locale, RULES_STAGING);
+
+foreach ($rules['rules'] as $key => $value) {
+    $buildRule[$key] = Rule::buildRuleString($value['type'], $value['content']);
+}

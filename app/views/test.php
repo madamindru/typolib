@@ -4,7 +4,6 @@ namespace Typolib;
 /* Test something here */
 $locales = Locale::getLocaleList();
 dump($locales);
-$repo_mgr = new RepoManager();
 ?>
 
 <form id="mainform">

@@ -33,10 +33,7 @@
         <input type="submit" name="delete_code" value="Delete" alt="Delete" />
 
         <br/>
-        <fieldset>
-            <p>Enter a new rule:<br />
-            <input type="text" name="rule" id="rule" value="<?=$first_rule;?>"/></p>
-        </fieldset>
+        <?php include VIEWS . 'replace_with_template.php'; ?>
 
         <br/>
         <fieldset>

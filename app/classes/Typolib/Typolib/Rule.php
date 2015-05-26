@@ -20,11 +20,11 @@ class Rule
     private $type;
     private $comment;
     // FIXME: string?
-    private static $rules_type = ['if_then'     => 'IF […] THEN […]',
-                                  'contains'    => 'CONTAINS […]',
+    public static $rules_type = [ 'if_then'     => 'IF %s THEN %s',
+                                  'contains'    => 'CONTAINS %s',
                                   'string'      => 'STRING',
-                                  'starts_with' => 'STARTS WITH […]',
-                                  'ends_with'   => 'ENDS WITH […]', ];
+                                  'starts_with' => 'STARTS WITH %s',
+                                  'ends_with'   => 'ENDS WITH %s', ];
     private static $ifThenRuleArray = [];
     private static $variable_to_ignore_array = [];
     private static $start_variable_tag = '<-';
@@ -40,7 +40,6 @@ class Rule
                                             ['„','“'],
                                             ['„','”'],
                                             ['”','”'],
-
                                       ];
 
     /**
@@ -49,7 +48,7 @@ class Rule
      *
      * @param  String  $name_code   The code name from which the rule depends.
      * @param  String  $locale_code The locale code from which the rule depends.
-     * @param  String  $content     The content of the new rule.
+     * @param  array   $content     The content of the new rule.
      * @param  String  $type        The type of the new rule.
      * @param  String  $comment     The comment of the new rule.
      * @return boolean True if the rule has been created.
@@ -59,11 +58,13 @@ class Rule
         $success = false;
 
         if (Code::existCode($name_code, $locale_code, RULES_STAGING) && self::isSupportedType($type)) {
-            $this->content = $content;
-            $this->type = $type;
-            $this->comment = $comment;
-            $this->createRule($name_code, $locale_code);
-            $success = true;
+            if (array_filter($content)) {
+                $this->content = $content;
+                $this->type = $type;
+                $this->comment = $comment;
+                $this->createRule($name_code, $locale_code);
+                $success = true;
+            }
         }
 
         if (! $success) {
@@ -259,29 +260,28 @@ class Rule
     /**
      * Check a "quotation mark" rule.
      *
-     * @param  string $user_string   The string entered by the user.
-     * @param  string $wanted_quotes The quotation mark wanted by the user.
-     * @return string $user_string  The text corrected.
+     * @param  string $user_string The string entered by the user.
+     * @param  string $before      The opening quotation mark wanted by the user.
+     * @param  string $after       The ending quotation mark wanted by the user.
+     * @return array  $res         The text corrected and the position of the
+     *                            quotation .
      */
-    public static function checkQuotationMarkRule($user_string, $wanted_quotes)
+    public static function checkQuotationMarkRule($user_string, $before, $after)
     {
+        $res = []; // var to be returned
         $array_quotation_marks = self::findQuotationMarks($user_string);
 
         if ($array_quotation_marks != false) {
-            $pieces = explode(';', $wanted_quotes);
-            $before = $pieces[0];
-            $after = $pieces[1];
-
             $count = 0;
             foreach ($array_quotation_marks as $position => $quote) {
                 if ($count % 2 == 0) {
-                    $user_string = Strings::replaceString(
+                    $user_string = \Typolib\Strings::replaceString(
                                                             $user_string,
                                                             $before,
                                                             $position
                                                         );
                 } else {
-                    $user_string = Strings::replaceString(
+                    $user_string = \Typolib\Strings::replaceString(
                                                             $user_string,
                                                             $after,
                                                             $position
@@ -290,7 +290,10 @@ class Rule
                 $count++;
             }
 
-            return $user_string;
+            array_push($res, $user_string);
+            array_push($res, array_keys($array_quotation_marks));
+
+            return $res;
         }
 
         return false;
@@ -514,5 +517,12 @@ class Rule
     public static function getRulesTypeList()
     {
         return self::$rules_type;
+    }
+
+    public static function buildRuleString($type, $rule)
+    {
+        if (self::isSupportedType($type)) {
+            return vsprintf(self::$rules_type[$type], $rule);
+        }
     }
 }

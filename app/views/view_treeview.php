@@ -22,7 +22,7 @@
                         <li>
                             <input type="checkbox" id="item-<?=$type_number;?>-<?=$rule_number;?>" />
                             <label for="item-<?=$type_number;?>-<?=$rule_number;?>" class="rule" data-id-rule="<?=$id_rule;?>">
-                                <?=$rule['content']?>
+                                <?=$buildRule[$id_rule]?>
                             </label>
                             <input type="button" class="button button-negative delete-rule" value="×">
                             <?php if (isset($rule['comment'])) : ?>

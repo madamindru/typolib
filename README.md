@@ -16,6 +16,7 @@ Typolib’ is a project created by French students in MIAGE with the help of the
 
 - PHP >= 5.4
 - php-curl extension (```sudo apt-get install php5-curl```)
+- php-intl extension (```sudo apt-get install php5-intl```)
 - Composer (Dependency Manager for PHP, [Composer](http://getcomposer.org/))
 
 
