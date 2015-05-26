@@ -260,26 +260,28 @@ class Rule
     /**
      * Check a "quotation mark" rule.
      *
-     * @param  string $user_string  The string entered by the user.
-     * @param  string $before The opening quotation mark wanted by the user.
-     * @param  string $after The ending quotation mark wanted by the user.
-     * @return string $user_string  The text corrected.
+     * @param  string $user_string The string entered by the user.
+     * @param  string $before      The opening quotation mark wanted by the user.
+     * @param  string $after       The ending quotation mark wanted by the user.
+     * @return array  $res         The text corrected and the position of the
+     *                            quotation .
      */
     public static function checkQuotationMarkRule($user_string, $before, $after)
     {
+        $res = []; // var to be returned
         $array_quotation_marks = self::findQuotationMarks($user_string);
 
-        if ($arrayQuotationMarks != false) {
+        if ($array_quotation_marks != false) {
             $count = 0;
             foreach ($array_quotation_marks as $position => $quote) {
                 if ($count % 2 == 0) {
-                    $user_string = Strings::replaceString(
+                    $user_string = \Typolib\Strings::replaceString(
                                                             $user_string,
                                                             $before,
                                                             $position
                                                         );
                 } else {
-                    $user_string = Strings::replaceString(
+                    $user_string = \Typolib\Strings::replaceString(
                                                             $user_string,
                                                             $after,
                                                             $position
@@ -288,7 +290,10 @@ class Rule
                 $count++;
             }
 
-            return $user_string;
+            array_push($res, $user_string);
+            array_push($res, array_keys($array_quotation_marks));
+
+            return $res;
         }
 
         return false;

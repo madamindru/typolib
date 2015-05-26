@@ -33,7 +33,7 @@
         <input type="submit" name="delete_code" value="Delete" alt="Delete" />
 
         <br/>
-        <?php include VIEWS . 'if_then_template.php'; ?>
+        <?php include VIEWS . 'replace_with_template.php'; ?>
 
         <br/>
         <fieldset>
