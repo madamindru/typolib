@@ -287,11 +287,12 @@ fieldset {
 }
 
 textarea {
-    width: 600px;
+    width: 300px;
     height: 120px;
     border: 3px solid #cccccc;
     padding: 5px;
     font-size: 1.3em;
+    resize:none;
 }
 
 #main select {

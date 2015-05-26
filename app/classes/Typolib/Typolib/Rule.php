@@ -19,7 +19,7 @@ class Rule
     private $type;
     private $comment;
     // FIXME: string?
-    private static $rules_type = ['if_then'     => 'IF […] THEN […]',
+    private static $rules_type = ['if_then'     => 'REPLACE […] WITH […]',
                                   'contains'    => 'CONTAINS […]',
                                   'string'      => 'STRING',
                                   'starts_with' => 'STARTS WITH […]',
